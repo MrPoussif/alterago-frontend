@@ -19,8 +19,25 @@ const store = configureStore({
   reducer: { user },
 });
 
-// import MapScreen from './screens/MapScreen';
-// import PlacesScreen from './screens/PlacesScreen';
+// *** IMPORT CLERK */
+import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
+// *** Ajout du token cache
+const tokenCache = {
+  async getToken(key) {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch {
+      return null;
+    }
+  },
+  async saveToken(key, value) {
+    try {
+      await SecureStore.setItemAsync(key, value);
+    } catch {}
+  },
+};
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
@@ -55,15 +72,23 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Connexion" component={ConnexionScreen} />
-          <Stack.Screen name="Creation" component={CreationScreen} />
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>
+    <ClerkProvider
+      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {/* Utilisateur NON connecté */}
+            <Stack.Screen name="Connexion" component={ConnexionScreen} />
+            <Stack.Screen name="Creation" component={CreationScreen} />
+
+            {/* Utilisateur connecté */}
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
+    </ClerkProvider>
   );
 }
 

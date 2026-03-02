@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -7,19 +8,91 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  View,
+  Alert,
 } from "react-native";
 import { useDispatch } from "react-redux";
-import { updateNickname } from "../reducers/user";
+import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
 
 export default function ConnexionScreen({ navigation }) {
   const dispatch = useDispatch();
-  const localIp = "//192.168.100.117";
-  const [nickname, setNickname] = useState("");
 
-  const handleSubmit = () => {
-    dispatch(updateNickname(nickname));
-    navigation.navigate("Creation");
+  // *** Check if user is already SignedIn
+  const { isSignedIn } = useUser();
+  useEffect(() => {
+    if (isSignedIn) {
+      navigation.replace("TabNavigator");
+    }
+  }, [isSignedIn]);
+
+  const [loading, setLoading] = useState(false);
+  // *** Set SignUp function
+  const {
+    isLoaded: signUpLoaded,
+    signUp,
+    setActive: setActiveSignUp,
+  } = useSignUp();
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+
+  const onSignUpPress = async () => {
+    if (!signUpLoaded) return;
+
+    try {
+      setLoading(true);
+
+      const result = await signUp.create({
+        emailAddress: signUpEmail,
+        password: signUpPassword,
+      });
+
+      await setActiveSignUp({ session: result.createdSessionId });
+
+      navigation.replace("TabNavigator");
+    } catch (err) {
+      Alert.alert("Sign Up Error", err.errors?.[0]?.message || "Try again");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // *** Set SignIn function
+  const {
+    isLoaded: signInLoaded,
+    signIn,
+    setActive: setActiveSignIn,
+  } = useSignIn();
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+
+  const onSignInPress = async () => {
+    if (!signInLoaded) return;
+
+    try {
+      setLoading(true);
+
+      const result = await signIn.create({
+        identifier: signInEmail,
+        password: signInPassword,
+      });
+
+      await setActiveSignIn({ session: result.createdSessionId });
+
+      navigation.replace("TabNavigator");
+    } catch (err) {
+      Alert.alert("Sign In Error", err.errors?.[0]?.message || "Try again");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!signUpLoaded || !signInLoaded) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#ec6e5b" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -27,19 +100,46 @@ export default function ConnexionScreen({ navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <Text style={styles.title}>Welcome to AlterAgo</Text>
-
+      {/* BLOC DE CONNEXION */}
       <TextInput
-        placeholder="Nickname"
-        onChangeText={(value) => setNickname(value)}
-        value={nickname}
+        placeholder="Email"
+        onChangeText={(value) => setSignInEmail(value)}
+        value={signInEmail}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Password"
+        onChangeText={(value) => setSignInPassword(value)}
+        value={signInPassword}
         style={styles.input}
       />
       <TouchableOpacity
-        onPress={() => handleSubmit()}
+        onPress={() => onSignInPress()}
         style={styles.button}
         activeOpacity={0.8}
       >
-        <Text style={styles.textButton}>Go to creation</Text>
+        <Text style={styles.textButton}>Sign In</Text>
+      </TouchableOpacity>
+      <View style={styles.line}></View>
+      {/* BLOC DE CREATION DE COMPTE */}
+      <TextInput
+        placeholder="Email"
+        onChangeText={(value) => setSignUpEmail(value)}
+        value={signUpEmail}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Password"
+        onChangeText={(value) => setSignUpPassword(value)}
+        value={signUpPassword}
+        style={styles.input}
+      />
+      <TouchableOpacity
+        onPress={() => onSignUpPress()}
+        style={styles.button}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.textButton}>Sign Up</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -61,7 +161,6 @@ const styles = StyleSheet.create({
     fontSize: 38,
     fontWeight: "600",
     color: "black",
-    backgroundColor: "green",
   },
   input: {
     width: "80%",
@@ -84,5 +183,10 @@ const styles = StyleSheet.create({
     height: 30,
     fontWeight: "600",
     fontSize: 16,
+  },
+  line: {
+    borderTopWidth: 2,
+    borderTopColor: "#07905C",
+    width: "70%",
   },
 });

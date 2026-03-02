@@ -1,12 +1,14 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { useUser } from "@clerk/clerk-expo";
+const { user } = useUser();
 
 export default function CreationScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Creation Screen</Text>
       <Button
-        title="Go to Home"
+        title="Validation"
         onPress={() => navigation.navigate("TabNavigator")}
       />
     </View>
