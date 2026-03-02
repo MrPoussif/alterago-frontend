@@ -5,10 +5,10 @@ export default function SocialScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Social Screen</Text>
-      <Button
+      {/* <Button
         title="Go to Profile"
         // onPress={() => navigation.navigate("Profile")}
-      />
+      /> */}
     </View>
   );
 }

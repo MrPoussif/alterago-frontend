@@ -18,7 +18,7 @@ export default function ConnexionScreen({ navigation }) {
 
   const handleSubmit = () => {
     dispatch(updateNickname(nickname));
-    navigation.navigate("CreationScreen");
+    navigation.navigate("Creation");
   };
 
   return (

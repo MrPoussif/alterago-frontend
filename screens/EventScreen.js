@@ -5,10 +5,10 @@ export default function EventScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Event Screen</Text>
-      <Button
+      {/* <Button
         title="Go to Profile"
         // onPress={() => navigation.navigate("Profile")}
-      />
+      /> */}
     </View>
   );
 }

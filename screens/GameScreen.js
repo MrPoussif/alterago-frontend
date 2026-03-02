@@ -5,10 +5,10 @@ export default function GameScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Game Screen</Text>
-      <Button
+      {/* <Button
         title="Go to Profile"
         // onPress={() => navigation.navigate("Profile")}
-      />
+      /> */}
     </View>
   );
 }

@@ -5,10 +5,10 @@ export default function SettingsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text>Settings Screen</Text>
-      <Button
+      {/* <Button
         title="Go to Profile"
         onPress={() => navigation.navigate("Profile")}
-      />
+      /> */}
     </View>
   );
 }

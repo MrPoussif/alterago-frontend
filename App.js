@@ -26,14 +26,17 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName = "";
 
-          if (route.name === "Map") {
-            iconName = "location-arrow";
-          } else if (route.name === "Places") {
-            iconName = "map-pin";
+          if (route.name === "Home") {
+            iconName = "home";
+          } else if (route.name === "Event") {
+            iconName = "map";
+          } else if (route.name === "Social") {
+            iconName = "users";
           }
 
           return <FontAwesome name={iconName} size={size} color={color} />;
