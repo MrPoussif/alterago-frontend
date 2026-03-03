@@ -1,7 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  value: { nickname: null, places: [] },
+  value: {
+    nickname: null,
+    firstname: null,
+    lastname: null,
+    email: null,
+    clerkId: null,
+    picture: null,
+  },
 };
 
 export const userSlice = createSlice({
@@ -11,28 +18,26 @@ export const userSlice = createSlice({
     updateNickname: (state, action) => {
       state.value.nickname = action.payload;
     },
-    addPlace: (state, action) => {
-      state.value.places.push(action.payload);
+    updateFirstname: (state, action) => {
+      state.value.firstname.push(action.payload);
     },
-    addMultiplePlaces: (state, action) => {
-      state.value.places = action.payload;
+    updateLastname: (state, action) => {
+      state.value.lastname = action.payload;
     },
-    removePlace: (state, action) => {
-      state.value.places = state.value.places.filter(
-        (e) => e.name !== action.payload,
-      );
+    updateEmail: (state, action) => {
+      state.value.email = action.payload;
     },
-    removeAllPlaces: (state, action) => {
-      state.value.places = [];
+    updatePicture: (state, action) => {
+      state.value.picture = action.payload;
     },
   },
 });
 
 export const {
   updateNickname,
-  addPlace,
-  addMultiplePlaces,
-  removePlace,
-  removeAllPlaces,
+  updateFirstname,
+  updateLastname,
+  updateEmail,
+  updatePicture,
 } = userSlice.actions;
 export default userSlice.reducer;
