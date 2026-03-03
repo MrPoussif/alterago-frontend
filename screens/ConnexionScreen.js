@@ -49,7 +49,7 @@ export default function ConnexionScreen({ navigation }) {
 
       await setActiveSignUp({ session: result.createdSessionId });
 
-      navigation.replace("TabNavigator");
+      navigation.replace("Creation");
     } catch (err) {
       Alert.alert("Sign Up Error", err.errors?.[0]?.message || "Try again");
     } finally {
