@@ -23,7 +23,7 @@ const store = configureStore({
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import * as SecureStore from "expo-secure-store";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 // // *** Ajout du token cache
 // const tokenCache = {
 //   async getToken(key) {
@@ -74,6 +74,7 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
+    // <SafeAreaView style={styles.container}>
     <ClerkProvider
       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
@@ -91,6 +92,7 @@ export default function App() {
         </NavigationContainer>
       </Provider>
     </ClerkProvider>
+    // </SafeAreaView>
   );
 }
 

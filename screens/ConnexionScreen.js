@@ -21,7 +21,7 @@ export default function ConnexionScreen({ navigation }) {
   const { isSignedIn } = useUser();
   useEffect(() => {
     if (isSignedIn) {
-      navigation.replace("TabNavigator");
+      navigation.replace("Creation");
     }
   }, [isSignedIn]);
 
