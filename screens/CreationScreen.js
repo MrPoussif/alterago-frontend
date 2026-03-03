@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-// import Dropdown from "react-native-input-select";
+import GenderSelect from "../components/GenderSelect";
 
 const avatars = [
   require("../assets/avatars/avatar-1.jpg"),
@@ -24,22 +24,16 @@ export default function CreationScreen({ navigation }) {
   const [age, setAge] = useState(null);
   const [gender, setGender] = useState(null);
   const [avatarIndex, setAvatarIndex] = useState(0);
-  // const newUser = {};
 
   const handlePreviousPress = () => {
     avatarIndex === 0 ? setAvatarIndex(3) : setAvatarIndex(avatarIndex - 1);
-    console.log("previous");
-    console.log(avatarIndex);
   };
   const handleNextPress = () => {
     avatarIndex === 3 ? setAvatarIndex(0) : setAvatarIndex(avatarIndex + 1);
-    console.log("next");
-    console.log(avatarIndex);
   };
   const handleConfirmationPress = () => {
     navigation.navigate("TabNavigator");
   };
-  // let avatar = `../assets/avatars/avatar-${avatarIndex}.jpg`;
   return (
     <View style={styles.container}>
       <Image
@@ -84,20 +78,7 @@ export default function CreationScreen({ navigation }) {
         style={styles.input}
       />
       <View style={styles.inputBisContainer}>
-        {/* <Dropdown
-          label="Country"
-          placeholder="Select an option..."
-          options={[
-            { label: "Nigeria", value: "NG" },
-            { label: "Åland Islands", value: "AX" },
-            { label: "Algeria", value: "DZ" },
-            { label: "American Samoa", value: "AS" },
-            { label: "Andorra", value: "AD" },
-          ]}
-          selectedValue={country}
-          onValueChange={(value) => setCountry(value)}
-          primaryColor={"green"}
-        /> */}
+        <GenderSelect value={gender} onChange={setGender} />
         <TextInput
           placeholder="Age"
           onChangeText={(value) => setAge(value)}
