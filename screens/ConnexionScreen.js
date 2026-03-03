@@ -12,31 +12,31 @@ import {
   Alert,
 } from "react-native";
 import { useDispatch } from "react-redux";
-// import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
-// coucou
+import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
+
 export default function ConnexionScreen({ navigation }) {
   const dispatch = useDispatch();
 
   // *** Check if user is already SignedIn
-  // const { isSignedIn } = useUser();
-  // useEffect(() => {
-  //   if (isSignedIn) {
-  //     navigation.replace("TabNavigator");
-  //   }
-  // }, [isSignedIn]);
+  const { isSignedIn } = useUser();
+  useEffect(() => {
+    if (isSignedIn) {
+      navigation.replace("TabNavigator");
+    }
+  }, [isSignedIn]);
 
   const [loading, setLoading] = useState(false);
   // *** Set SignUp function ************************************
-  // const {
-  //   isLoaded: signUpLoaded,
-  //   signUp,
-  //   setActive: setActiveSignUp,
-  // } = useSignUp();
+  const {
+    isLoaded: signUpLoaded,
+    signUp,
+    setActive: setActiveSignUp,
+  } = useSignUp();
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   // HANDLE SIGNUP PRESS
   const onSignUpPress = async () => {
-    // if (!signUpLoaded) return;
+    if (!signUpLoaded) return;
 
     try {
       setLoading(true);
@@ -45,8 +45,9 @@ export default function ConnexionScreen({ navigation }) {
         emailAddress: signUpEmail,
         password: signUpPassword,
       });
+      console.log(result);
 
-      // await setActiveSignUp({ session: result.createdSessionId });
+      await setActiveSignUp({ session: result.createdSessionId });
 
       navigation.replace("TabNavigator");
     } catch (err) {
@@ -57,27 +58,27 @@ export default function ConnexionScreen({ navigation }) {
   };
 
   // *** Set SignIn function ************************************
-  // const {
-  //   isLoaded: signInLoaded,
-  //   signIn,
-  //   setActive: setActiveSignIn,
-  // } = useSignIn();
+  const {
+    isLoaded: signInLoaded,
+    signIn,
+    setActive: setActiveSignIn,
+  } = useSignIn();
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
 
   // HANDLE SIGNIN PRESS
   const onSignInPress = async () => {
-    // if (!signInLoaded) return;
+    if (!signInLoaded) return;
 
     try {
-      //   setLoading(true);
+      setLoading(true);
 
-      //   const result = await signIn.create({
-      //     identifier: signInEmail,
-      //     password: signInPassword,
-      //   });
+      const result = await signIn.create({
+        identifier: signInEmail,
+        password: signInPassword,
+      });
 
-      //   await setActiveSignIn({ session: result.createdSessionId });
+      await setActiveSignIn({ session: result.createdSessionId });
 
       navigation.replace("TabNavigator");
     } catch (err) {
@@ -87,13 +88,13 @@ export default function ConnexionScreen({ navigation }) {
     }
   };
 
-  // if (!signUpLoaded || !signInLoaded) {
-  //   return (
-  //     <View style={styles.loaderContainer}>
-  //       <ActivityIndicator size="large" color="#ec6e5b" />
-  //     </View>
-  //   );
-  // }
+  if (!signUpLoaded || !signInLoaded) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#ec6e5b" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
