@@ -20,8 +20,9 @@ const store = configureStore({
 });
 
 // // *** IMPORT CLERK */
-// import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
-// import * as SecureStore from "expo-secure-store";
+import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import * as SecureStore from "expo-secure-store";
 // // *** Ajout du token cache
 // const tokenCache = {
 //   async getToken(key) {
@@ -72,12 +73,23 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    // <ClerkProvider
-    //   publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-    //   tokenCache={tokenCache}
-    // >
+    <ClerkProvider
+      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {/* Utilisateur NON connecté */}
+            <Stack.Screen name="Connexion" component={ConnexionScreen} />
+            <Stack.Screen name="Creation" component={CreationScreen} />
 
-    // </ClerkProvider>
+            {/* Utilisateur connecté */}
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Provider>
+    </ClerkProvider>
   );
 }
 
