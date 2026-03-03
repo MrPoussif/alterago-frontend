@@ -76,18 +76,7 @@ export default function App() {
     //   publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
     //   tokenCache={tokenCache}
     // >
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* Utilisateur NON connecté */}
-          <Stack.Screen name="Connexion" component={ConnexionScreen} />
-          <Stack.Screen name="Creation" component={CreationScreen} />
 
-          {/* Utilisateur connecté */}
-          <Stack.Screen name="TabNavigator" component={TabNavigator} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>
     // </ClerkProvider>
   );
 }
