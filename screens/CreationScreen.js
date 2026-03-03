@@ -1,7 +1,7 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { useUser } from "@clerk/clerk-expo";
-const { user } = useUser();
+// import { useUser } from "@clerk/clerk-expo";
+// const { user } = useUser();
 
 export default function CreationScreen({ navigation }) {
   return (
