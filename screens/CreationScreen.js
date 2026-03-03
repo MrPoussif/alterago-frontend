@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+// import Dropdown from "react-native-input-select";
 
-// import { useUser } from "@clerk/clerk-expo";
-// const { user } = useUser();
 const avatars = [
   require("../assets/avatars/avatar-1.jpg"),
   require("../assets/avatars/avatar-2.jpg"),
@@ -85,12 +84,20 @@ export default function CreationScreen({ navigation }) {
         style={styles.input}
       />
       <View style={styles.inputBisContainer}>
-        <TextInput
-          placeholder="Genre"
-          onChangeText={(value) => setGender(value)}
-          value={gender}
-          style={styles.inputBis}
-        />
+        {/* <Dropdown
+          label="Country"
+          placeholder="Select an option..."
+          options={[
+            { label: "Nigeria", value: "NG" },
+            { label: "Åland Islands", value: "AX" },
+            { label: "Algeria", value: "DZ" },
+            { label: "American Samoa", value: "AS" },
+            { label: "Andorra", value: "AD" },
+          ]}
+          selectedValue={country}
+          onValueChange={(value) => setCountry(value)}
+          primaryColor={"green"}
+        /> */}
         <TextInput
           placeholder="Age"
           onChangeText={(value) => setAge(value)}
