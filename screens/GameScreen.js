@@ -5,12 +5,12 @@ import MemoryGame from "../components/MemoryGame";
 export default function GameScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text>Game Screen</Text>
+      <MemoryGame />
+      {/* <Text>Game Screen</Text> */}
       {/* <Button
         title="Go to Profile"
         // onPress={() => navigation.navigate("Profile")}
       /> */}
-      <MemoryGame />
     </View>
   );
 }

@@ -10,6 +10,9 @@ import CreationScreen from "./screens/CreationScreen";
 import SocialScreen from "./screens/SocialScreen";
 import EventScreen from "./screens/EventScreen";
 import HomeScreen from "./screens/HomeScreen";
+import GameScreen from "./screens/GameScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import RecipeScreen from "./screens/RecipeScreen";
 
 // *** Store redux
 import { Provider } from "react-redux";
@@ -86,6 +89,9 @@ export default function App() {
 
             {/* Utilisateur connecté */}
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="Game" component={GameScreen} />
+            <Stack.Screen name="Settings" component={SettingsScreen} />
+            <Stack.Screen name="Recipe" component={RecipeScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
