@@ -1,5 +1,6 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
+import MemoryGame from "../components/MemoryGame";
 
 export default function GameScreen({ navigation }) {
   return (
@@ -9,6 +10,7 @@ export default function GameScreen({ navigation }) {
         title="Go to Profile"
         // onPress={() => navigation.navigate("Profile")}
       /> */}
+      <MemoryGame />
     </View>
   );
 }
