@@ -1,6 +1,8 @@
 import {
   Button,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -10,6 +12,7 @@ import {
 import React, { useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GenderSelect from "../components/GenderSelect";
+import { useAuth } from "@clerk/clerk-expo";
 
 const avatars = [
   require("../assets/avatars/avatar-1.jpg"),
@@ -25,20 +28,58 @@ export default function CreationScreen({ navigation }) {
   const [gender, setGender] = useState(null);
   const [avatarIndex, setAvatarIndex] = useState(0);
 
+  const { getToken } = useAuth();
+
   const handlePreviousPress = () => {
-    avatarIndex === 0 ? setAvatarIndex(3) : setAvatarIndex(avatarIndex - 1);
+    avatarIndex === 0
+      ? setAvatarIndex(avatars.length - 1)
+      : setAvatarIndex(avatarIndex - 1);
   };
   const handleNextPress = () => {
-    avatarIndex === 3 ? setAvatarIndex(0) : setAvatarIndex(avatarIndex + 1);
+    avatarIndex === avatars.length - 1
+      ? setAvatarIndex(0)
+      : setAvatarIndex(avatarIndex + 1);
   };
   const handleConfirmationPress = () => {
-    navigation.navigate("TabNavigator");
+    (async () => {
+      try {
+        const token = await getToken();
+
+        const res = await fetch("http://192.168.100.117:3000/users/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            nickname,
+            firstname,
+            lastname,
+            age: Number(age),
+            gender,
+            picture: avatars[avatarIndex],
+          }),
+        });
+        const data = await res.json();
+        console.log("Utilisateur enregistré");
+        // navigation.navigate("TabNavigator");
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    })();
   };
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <Image
         source={avatars[avatarIndex]}
-        style={{ width: 150, height: 150, marginBottom: 40 }}
+        style={{
+          width: 150,
+          height: 150,
+          marginBottom: 5,
+        }}
       />
       <View style={styles.arrowsBox}>
         <TouchableOpacity
@@ -58,7 +99,6 @@ export default function CreationScreen({ navigation }) {
           <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
         </TouchableOpacity>
       </View>
-      {/* // TODO Ajouter les champs pour créer l'utilisateur sur mongoDB */}
       <TextInput
         placeholder="Pseudo"
         onChangeText={(value) => setNickname(value)}
@@ -92,7 +132,7 @@ export default function CreationScreen({ navigation }) {
       >
         <Text style={styles.btnTxt}>Valider</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -110,7 +150,8 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "70%",
-    marginTop: 25,
+    marginTop: 20,
+    paddingBottom: 5,
     borderBottomColor: "#07905C",
     borderBottomWidth: 1,
     fontSize: 18,
@@ -122,9 +163,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   inputBis: {
-    width: "30%",
+    width: "20%",
     borderBottomColor: "#07905C",
     borderBottomWidth: 1,
+    paddingBottom: 5,
     fontSize: 18,
   },
   button: {

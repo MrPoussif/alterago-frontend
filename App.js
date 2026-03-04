@@ -74,33 +74,32 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    // <SafeAreaView style={styles.container}>
     <ClerkProvider
       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
     >
       <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {/* Utilisateur NON connecté */}
-            <Stack.Screen name="Connexion" component={ConnexionScreen} />
-            <Stack.Screen name="Creation" component={CreationScreen} />
+        {/* <SafeAreaProvider> */}
+        <SafeAreaView style={styles.container}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              {/* Utilisateur NON connecté */}
+              <Stack.Screen name="Connexion" component={ConnexionScreen} />
+              <Stack.Screen name="Creation" component={CreationScreen} />
 
-            {/* Utilisateur connecté */}
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
-          </Stack.Navigator>
-        </NavigationContainer>
+              {/* Utilisateur connecté */}
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+        {/* </SafeAreaProvider> */}
       </Provider>
     </ClerkProvider>
-    // </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

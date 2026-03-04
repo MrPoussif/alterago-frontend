@@ -22,7 +22,7 @@ export default function GenderSelect({ value, onChange }) {
         onPress={() => setVisible(true)}
       >
         <Text style={value ? styles.text : styles.placeholder}>
-          {value || "Choisir un genre"}
+          {value || "Genre"}
         </Text>
       </TouchableOpacity>
 
@@ -64,7 +64,8 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
     borderRadius: 10,
   },
   text: {
