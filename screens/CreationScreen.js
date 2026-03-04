@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Image,
   KeyboardAvoidingView,
@@ -9,17 +10,25 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GenderSelect from "../components/GenderSelect";
 import { useAuth } from "@clerk/clerk-expo";
+import * as ImagePicker from "expo-image-picker";
 
 const avatars = [
-  require("../assets/avatars/avatar-1.jpg"),
-  require("../assets/avatars/avatar-2.jpg"),
-  require("../assets/avatars/avatar-3.jpg"),
-  require("../assets/avatars/avatar-4.jpg"),
+  "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639193/avatar-4_j5xnac.jpg",
+  "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639191/avatar-3_jmupfn.jpg",
+  "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639191/avatar-2_ouugyv.jpg",
+  "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639190/avatar-1_y52gge.jpg",
 ];
+// const avatars = [
+//   require("../assets/avatars/avatar-1.jpg"),
+//   require("../assets/avatars/avatar-2.jpg"),
+//   require("../assets/avatars/avatar-3.jpg"),
+//   require("../assets/avatars/avatar-4.jpg"),
+// ];
+
 export default function CreationScreen({ navigation }) {
   const [nickname, setNickname] = useState("");
   const [firstname, setFirstname] = useState("");
@@ -27,13 +36,41 @@ export default function CreationScreen({ navigation }) {
   const [age, setAge] = useState(null);
   const [gender, setGender] = useState(null);
   const [avatarIndex, setAvatarIndex] = useState(0);
-
+  const [image, setImage] = useState(null);
   const { getToken } = useAuth();
-
+  useEffect(() => {
+    console.log("use effect");
+  }, []);
   const handlePreviousPress = () => {
     avatarIndex === 0
       ? setAvatarIndex(avatars.length - 1)
       : setAvatarIndex(avatarIndex - 1);
+  };
+  const handleUploadPress = () => {
+    console.log("UPLOAD");
+    (async () => {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult) {
+        Alert.alert(
+          "Permission required",
+          "Permission to access the media library is required.",
+        );
+        return;
+      }
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images", "videos"],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      console.log(result);
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    })();
   };
   const handleNextPress = () => {
     avatarIndex === avatars.length - 1
@@ -43,12 +80,13 @@ export default function CreationScreen({ navigation }) {
   const handleConfirmationPress = () => {
     (async () => {
       try {
+        //Récupère le token Clerk lié au user
         const token = await getToken();
-
         const res = await fetch("http://192.168.100.117:3000/users/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            //Envoi le token dans le header pour vérification par middleware dans le backend
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
@@ -58,23 +96,35 @@ export default function CreationScreen({ navigation }) {
             age: Number(age),
             gender,
             picture: avatars[avatarIndex],
+            // friends: null,
+            // challenges: null,
           }),
         });
         const data = await res.json();
-        console.log("Utilisateur enregistré");
+        console.log("data", data);
+        // console.log("avatar", `${avatars[avatarIndex]}`);
+        console.log(avatars);
+
+        data ? alert(data.error) : console.log("Nouvel utilisateur enregistré");
+
+        // console.log("Avatar:", avatars[avatarIndex]);
+
         // navigation.navigate("TabNavigator");
       } catch (error) {
         console.error("Error:", error);
       }
     })();
   };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <Image
-        source={avatars[avatarIndex]}
+        source={{
+          uri: `${avatars[avatarIndex]}`,
+        }}
         style={{
           width: 150,
           height: 150,
@@ -82,20 +132,21 @@ export default function CreationScreen({ navigation }) {
         }}
       />
       <View style={styles.arrowsBox}>
-        <TouchableOpacity
-          onPress={() => handlePreviousPress()}
-          // style={styles.button}
-        >
+        <TouchableOpacity onPress={() => handlePreviousPress()}>
           <FontAwesome
             name={"arrow-left"}
             size={30}
             color={"#FFA85C"}
           ></FontAwesome>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleNextPress()}
-          // style={styles.button}
-        >
+        <TouchableOpacity onPress={() => handleUploadPress()}>
+          <FontAwesome
+            name={"upload"}
+            size={30}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleNextPress()}>
           <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
         </TouchableOpacity>
       </View>
@@ -144,7 +195,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   arrowsBox: {
-    width: "30%",
+    width: "40%",
     flexDirection: "row",
     justifyContent: "space-between",
   },
