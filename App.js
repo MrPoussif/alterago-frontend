@@ -1,10 +1,12 @@
+// App.js
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
+// Screens
 import ConnexionScreen from "./screens/ConnexionScreen";
 import CreationScreen from "./screens/CreationScreen";
 import SocialScreen from "./screens/SocialScreen";
@@ -14,12 +16,16 @@ import GameScreen from "./screens/GameScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import RecipeScreen from "./screens/RecipeScreen";
 
-// *** Store redux
+// Redux
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import user from "./reducers/user";
-import defis from "./reducers/defis"; // 🆕
+import defis from "./reducers/defis";
 
+// Clerk
+import { ClerkProvider, tokenCache } from "@clerk/clerk-expo";
+
+// Création du store Redux
 const store = configureStore({
   reducer: {
     user,
@@ -27,15 +33,10 @@ const store = configureStore({
   },
 });
 
-// // *** IMPORT CLERK */
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
-import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import * as SecureStore from "expo-secure-store";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Tab Navigator
 const TabNavigator = () => {
   return (
     <Tab.Navigator
@@ -44,13 +45,9 @@ const TabNavigator = () => {
         tabBarIcon: ({ color, size }) => {
           let iconName = "";
 
-          if (route.name === "Home") {
-            iconName = "home";
-          } else if (route.name === "Event") {
-            iconName = "map";
-          } else if (route.name === "Social") {
-            iconName = "users";
-          }
+          if (route.name === "Home") iconName = "home";
+          else if (route.name === "Event") iconName = "map";
+          else if (route.name === "Social") iconName = "users";
 
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
@@ -66,6 +63,7 @@ const TabNavigator = () => {
   );
 };
 
+// Composant principal App
 export default function App() {
   return (
     <ClerkProvider
@@ -73,19 +71,21 @@ export default function App() {
       tokenCache={tokenCache}
     >
       <Provider store={store}>
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {/* Utilisateur NON connecté */}
-            <Stack.Screen name="Connexion" component={ConnexionScreen} />
-            <Stack.Screen name="Creation" component={CreationScreen} />
+        <SafeAreaView style={styles.container}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              {/* Utilisateur NON connecté */}
+              <Stack.Screen name="Connexion" component={ConnexionScreen} />
+              <Stack.Screen name="Creation" component={CreationScreen} />
 
-            {/* Utilisateur connecté */}
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="Game" component={GameScreen} />
-            <Stack.Screen name="Settings" component={SettingsScreen} />
-            <Stack.Screen name="Recipe" component={RecipeScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+              {/* Utilisateur connecté */}
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen name="Game" component={GameScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen name="Recipe" component={RecipeScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
       </Provider>
     </ClerkProvider>
   );
@@ -94,8 +94,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
