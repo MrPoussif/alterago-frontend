@@ -1,10 +1,20 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { userSlice } from "../reducers/user";
 import { useSelector } from "react-redux";
+import { useAuth } from "@clerk/clerk-expo";
 
 export default function HomeScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
+  const { getToken } = useAuth();
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getToken();
+      console.log("Clerk token:", token);
+    };
+    fetchToken();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text>Home Screen</Text>
@@ -40,7 +50,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginTop: 20,
-    width: "60%",
+    width: "40%",
     justifyContent: "center",
   },
 });
