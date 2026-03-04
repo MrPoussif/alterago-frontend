@@ -18,8 +18,13 @@ import RecipeScreen from "./screens/RecipeScreen";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import user from "./reducers/user";
+import defis from "./reducers/defis"; // 🆕
+
 const store = configureStore({
-  reducer: { user },
+  reducer: {
+    user,
+    defis,
+  },
 });
 
 // // *** IMPORT CLERK */
@@ -27,24 +32,10 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-// // *** Ajout du token cache
-// const tokenCache = {
-//   async getToken(key) {
-//     try {
-//       return await SecureStore.getItemAsync(key);
-//     } catch {
-//       return null;
-//     }
-//   },
-//   async saveToken(key, value) {
-//     try {
-//       await SecureStore.setItemAsync(key, value);
-//     } catch {}
-//   },
-// };
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
 const TabNavigator = () => {
   return (
     <Tab.Navigator
@@ -77,7 +68,6 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    // <SafeAreaView style={styles.container}>
     <ClerkProvider
       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
       tokenCache={tokenCache}
@@ -98,7 +88,6 @@ export default function App() {
         </NavigationContainer>
       </Provider>
     </ClerkProvider>
-    // </SafeAreaView>
   );
 }
 
