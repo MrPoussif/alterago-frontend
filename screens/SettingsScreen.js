@@ -9,6 +9,15 @@ export default function SettingsScreen({ navigation }) {
         title="Go to Profile"
         onPress={() => navigation.navigate("Profile")}
       /> */}
+      <View style={{ height: 10 }} />
+      <Button
+        title="Changer de mot de passe"
+        onPress={() => navigation.navigate("")}
+      />
+      <View style={{ height: 10 }} />
+      <Button title="Changer de mail" onPress={() => navigation.navigate("")} />
+      <View style={{ height: 10 }} />
+      <Button title="Déconnexion" onPress={() => navigation.navigate("")} />
     </View>
   );
 }

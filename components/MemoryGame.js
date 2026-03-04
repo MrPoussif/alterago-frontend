@@ -14,7 +14,7 @@ import {
 
 const { width: SW } = Dimensions.get("window");
 const STATUS_BAR_H =
-  Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) : 44;
+  Platform.OS === "android" ? (StatusBar.currentHeight ?? 48) : 44;
 
 const ALL_EMOJIS = [
   "🍎",
@@ -439,15 +439,22 @@ export default function App() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#060d1f", paddingTop: STATUS_BAR_H },
+  root: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+    backgroundColor: "#060d1f",
+    paddingTop: STATUS_BAR_H,
+  },
 
   // Menu
   menuContainer: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
   },
+
   menuTitle: {
     fontSize: 52,
     fontWeight: "900",
