@@ -32,15 +32,6 @@ export default function EventScreen() {
         const location = await Location.getCurrentPositionAsync({});
         location && setCurrentPosition(location.coords);
         //récupération des filtres pour Modal
-<<<<<<< HEAD
-        fetch("http://192.168.100.230:3000/events/categories")
-          .then((res) => res.json())
-          .then((data) => {
-            console.log(data);
-
-            setFilters(data.token);
-          });
-=======
 
         const token = await getToken();
 
@@ -56,7 +47,6 @@ export default function EventScreen() {
         );
         const data = await rawQuery.json();
         setFilters(data);
->>>>>>> c90135066eb9186c49991053f650443c2e1e9571
         setModalVisible(true);
       }
     })();
@@ -89,14 +79,9 @@ export default function EventScreen() {
       }),
     });
     const data = await response.json();
-<<<<<<< HEAD
-    // console.log("data => ", data.length);
-    setPlaces(data.token);
-=======
     console.log("data => ", data);
     setPlaces(data);
     setModalVisible(false);
->>>>>>> c90135066eb9186c49991053f650443c2e1e9571
   };
 
   //fermer la modal de recherche

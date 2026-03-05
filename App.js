@@ -1,4 +1,3 @@
-// App.js
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -59,6 +58,28 @@ const TabNavigator = () => {
       <Tab.Screen name="Event" component={EventScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Social" component={SocialScreen} />
+      {/* Recipe garde la tab bar mais n'apparaît pas dans les onglets */}
+      <Tab.Screen
+        name="Recipe"
+        component={RecipeScreen}
+        options={{
+          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
+        }}
+      />
+      <Tab.Screen
+        name="Game"
+        component={GameScreen}
+        options={{
+          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
+        }}
+      />
     </Tab.Navigator>
   );
 };
@@ -82,7 +103,6 @@ export default function App() {
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Game" component={GameScreen} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
-              <Stack.Screen name="Recipe" component={RecipeScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>
