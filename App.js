@@ -22,8 +22,8 @@ import user from "./reducers/user";
 import defis from "./reducers/defis";
 
 // Clerk
-import { ClerkProvider, tokenCache } from "@clerk/clerk-expo";
-
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
 // Création du store Redux
 const store = configureStore({
   reducer: {
