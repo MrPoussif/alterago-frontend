@@ -30,6 +30,7 @@ export default function EventScreen() {
     (async () => {
       const result = await Location.requestForegroundPermissionsAsync();
       const status = result?.status;
+      console.log(status);
 
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync({});
@@ -53,6 +54,7 @@ export default function EventScreen() {
       }
     })();
   }, []);
+  console.log(currentPosition);
 
   //chargement avant re-render composant sinon currentLocation null
   if (!currentPosition)

@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#b3d0ee",
+    backgroundColor: "#79ADDC",
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 4,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   texteBouton: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#3578e5",
+    color: "#ffffffff",
   },
   supprimer: {
     marginLeft: 6,

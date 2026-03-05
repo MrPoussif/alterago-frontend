@@ -3,7 +3,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 /* ---------------- Défis fixes ---------------- */
-// Ce sont les défis qui apparaissent toujours et qui ne peuvent pas être supprimés
 const DEFIS_FIXES_INITIAL = [
   {
     id: "hydratation",
@@ -11,11 +10,11 @@ const DEFIS_FIXES_INITIAL = [
     icone: "🥤",
     max: 2000,
     min: 0,
-    pas: 200, // combien on ajoute/enlève quand on clique + ou -
+    pas: 200,
     unite: "L",
     diviseur: 1000,
     maxAffiche: 2,
-    valeur: 0, // valeur actuelle du défi
+    valeur: 0,
   },
   {
     id: "pas",
@@ -31,32 +30,29 @@ const DEFIS_FIXES_INITIAL = [
   },
 ];
 
+const initialState = {
+  fixes: DEFIS_FIXES_INITIAL,
+  personnalises: [],
+};
+
 /* ---------------- Slice Redux ---------------- */
-// Ici on crée notre slice pour gérer les défis
 const defisSlice = createSlice({
-  name: "defis", // nom du slice
-  initialState: {
-    fixes: DEFIS_FIXES_INITIAL, // défis fixes
-    personnalises: [], // défis ajoutés par l'utilisateur
-  },
+  name: "defis",
+  initialState,
   reducers: {
-    // Modifier la valeur d'un défi
     modifierValeur: (state, action) => {
       const { id, delta } = action.payload;
 
-      // Cherche le défi dans les fixes
-      const defiFixe = state.fixes.find((d) => d.id === id);
+      const defiFixe = state.fixes.find((defi) => defi.id === id);
       if (defiFixe) {
-        // On met à jour la valeur tout en restant entre min et max
         defiFixe.valeur = Math.max(
           defiFixe.min,
           Math.min(defiFixe.max, defiFixe.valeur + delta),
         );
-        return; // on sort de la fonction si on a trouvé
+        return;
       }
 
-      // Sinon, cherche le défi dans les personnalisés
-      const defiPerso = state.personnalises.find((d) => d.id === id);
+      const defiPerso = state.personnalises.find((defi) => defi.id === id);
       if (defiPerso) {
         defiPerso.valeur = Math.max(
           defiPerso.min,
@@ -65,38 +61,31 @@ const defisSlice = createSlice({
       }
     },
 
-    // Ajouter un nouveau défi personnalisé
     ajouterDefi: (state, action) => {
       const { nom } = action.payload;
       state.personnalises.push({
-        id: Date.now().toString(), // id unique
+        id: Date.now().toString(),
         nom: nom,
-        valeur: 0, // valeur initiale
+        valeur: 0,
         max: 100,
         min: 0,
-        pas: 10, // valeur par défaut à ajouter/enlever
+        pas: 10,
       });
     },
 
-    // Supprimer un défi personnalisé
     supprimerDefi: (state, action) => {
       const idASupprimer = action.payload.id;
-      // On garde tous les défis sauf celui qu'on veut supprimer
       state.personnalises = state.personnalises.filter(
-        (d) => d.id !== idASupprimer,
+        (defi) => defi.id !== idASupprimer,
       );
     },
   },
 });
 
 /* ---------------- Sélecteur ---------------- */
-// Sélecteur simple qui combine les défis fixes et personnalisés
-// ⚠️ Si un jour vous avez beaucoup de défis et que vous voulez optimiser
-// la performance, vous pouvez utiliser `createSelector` pour mémoriser le résultat
+// ✅ Reçoit le state Redux réel, pas initialState figé
 export const selectTousLesDefis = (state) => {
-  const fixes = state.defis.fixes;
-  const personnalises = state.defis.personnalises;
-  return fixes.concat(personnalises); // concat évite le spread [...]
+  return state.defis.fixes.concat(state.defis.personnalises);
 };
 
 // ---------------- Export ----------------
