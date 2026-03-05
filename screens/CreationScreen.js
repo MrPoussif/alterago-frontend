@@ -16,18 +16,13 @@ import GenderSelect from "../components/GenderSelect";
 import { useAuth } from "@clerk/clerk-expo";
 import * as ImagePicker from "expo-image-picker";
 
+//Avatars issus du dossier AlterAgo/avatars sur cloudinary
 const avatars = [
   "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639193/avatar-4_j5xnac.jpg",
   "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639191/avatar-3_jmupfn.jpg",
   "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639191/avatar-2_ouugyv.jpg",
   "https://res.cloudinary.com/dcnayzmst/image/upload/v1772639190/avatar-1_y52gge.jpg",
 ];
-// const avatars = [
-//   require("../assets/avatars/avatar-1.jpg"),
-//   require("../assets/avatars/avatar-2.jpg"),
-//   require("../assets/avatars/avatar-3.jpg"),
-//   require("../assets/avatars/avatar-4.jpg"),
-// ];
 
 export default function CreationScreen({ navigation }) {
   const [nickname, setNickname] = useState("");
@@ -87,7 +82,7 @@ export default function CreationScreen({ navigation }) {
           headers: {
             "Content-Type": "application/json",
             //Envoi le token dans le header pour vérification par middleware dans le backend
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             nickname,
@@ -96,18 +91,13 @@ export default function CreationScreen({ navigation }) {
             age: Number(age),
             gender,
             picture: avatars[avatarIndex],
-            // friends: null,
-            // challenges: null,
           }),
         });
         const data = await res.json();
         console.log("data", data);
-        // console.log("avatar", `${avatars[avatarIndex]}`);
         console.log(avatars);
 
         data ? alert(data.error) : console.log("Nouvel utilisateur enregistré");
-
-        // console.log("Avatar:", avatars[avatarIndex]);
 
         // navigation.navigate("TabNavigator");
       } catch (error) {
