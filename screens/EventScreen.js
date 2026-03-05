@@ -10,14 +10,16 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
 
 export default function EventScreen() {
   const [currentPosition, setCurrentPosition] = useState(null); //état position actuelle
   const [modalVisible, setModalVisible] = useState(false); //état visibilité de la Modal
   const [filters, setFilters] = useState([]); //état des filtres récupérés depuis backend
-  const [selectedFilter, setSelectedFilter] = useState(""); //état du filtre sélectionné dans la Modal
+  const [selectedFilter, setSelectedFilter] = useState("manger"); //état du filtre sélectionné dans la Modal
   const [places, setPlaces] = useState([]);
   const [radius, setRadius] = useState(1000); //état du rayon de recherche
+  const { getToken } = useAuth();
 
   //position actuelle
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function EventScreen() {
         const location = await Location.getCurrentPositionAsync({});
         location && setCurrentPosition(location.coords);
         //récupération des filtres pour Modal
+<<<<<<< HEAD
         fetch("http://192.168.100.230:3000/events/categories")
           .then((res) => res.json())
           .then((data) => {
@@ -37,6 +40,23 @@ export default function EventScreen() {
 
             setFilters(data.token);
           });
+=======
+
+        const token = await getToken();
+
+        const rawQuery = await fetch(
+          "http://192.168.100.230:3000/events/categories",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              //Envoi le token dans le header pour vérification par middleware dans le backend
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const data = await rawQuery.json();
+        setFilters(data);
+>>>>>>> c90135066eb9186c49991053f650443c2e1e9571
         setModalVisible(true);
       }
     })();
@@ -53,10 +73,14 @@ export default function EventScreen() {
 
   //lancer la recherche
   const handleClickSearch = async () => {
-    setModalVisible(false);
+    const token = await getToken();
+    // console.log("token =>", token);
     const response = await fetch("http://192.168.100.230:3000/events/nearby", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude,
@@ -65,14 +89,22 @@ export default function EventScreen() {
       }),
     });
     const data = await response.json();
+<<<<<<< HEAD
     // console.log("data => ", data.length);
     setPlaces(data.token);
+=======
+    console.log("data => ", data);
+    setPlaces(data);
+    setModalVisible(false);
+>>>>>>> c90135066eb9186c49991053f650443c2e1e9571
   };
 
+  //fermer la modal de recherche
   const handleClickClose = () => {
     setModalVisible(false);
   };
 
+  //ouvrir la modal de recherche
   const handleClickOpen = () => {
     setModalVisible(true);
   };
@@ -90,7 +122,7 @@ export default function EventScreen() {
   ];
 
   //markers des places selon filtre
-  const markers = places.map((data, i) => {
+  const markers = places?.map((data, i) => {
     return (
       <Marker
         key={i}
@@ -102,7 +134,7 @@ export default function EventScreen() {
   });
 
   //liste des filtres
-  const filtersList = filters.map((filter, i) => {
+  const filtersList = filters?.map((filter, i) => {
     return (
       <Picker.Item
         key={i}
@@ -127,12 +159,12 @@ export default function EventScreen() {
                 <Text style={styles.textCloseBtn}>X</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.picker}>
+            <View style={styles.pickerView}>
               <Picker
+                style={styles.picker}
                 mode="dropdown"
                 selectedValue={selectedFilter}
                 onValueChange={(value) => setSelectedFilter(value)}
-                itemStyle={{ height: "100%" }}
               >
                 {filtersList}
               </Picker>
@@ -160,16 +192,12 @@ export default function EventScreen() {
       >
         {markers}
       </MapView>
-      {/* <View>
-        <Modal style={styles.eventsList}>
-          <TouchableOpacity
-            style={styles.openModalBtn}
-            onPress={() => handleClickOpen()}
-          >
-            <Text style={styles.textOpenModal}>Rechercher</Text>
-          </TouchableOpacity>
-        </Modal>
-      </View> */}
+      <TouchableOpacity
+        style={styles.openModalBtn}
+        onPress={() => handleClickOpen()}
+      >
+        <Text style={styles.textOpenModal}>Rechercher</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -229,18 +257,20 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "bold",
   },
-  picker: {
+  pickerView: {
     display: "flex",
     borderWidth: 1,
     borderColor: "#FFA85C",
     borderRadius: 20,
     width: 200,
-    height: 40,
+  },
+  picker: {
+    height: 45,
     paddingBottom: 20,
   },
   pickerItem: {
     fontSize: 10,
-    // height: 30,
+    height: 30,
     // backgroundColor: "red",
   },
   mapView: {
