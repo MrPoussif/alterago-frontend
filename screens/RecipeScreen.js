@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 
@@ -26,10 +27,7 @@ export default function RecipeScreen({ navigation }) {
     }
     try {
       setLoading(true);
-
-      // Récupère le token Clerk dynamiquement (se renouvelle automatiquement)
       const token = await getToken();
-
       const res = await fetch("http://192.168.100.64:3000/recettes/random", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -52,54 +50,64 @@ export default function RecipeScreen({ navigation }) {
 
   if (!isSignedIn) {
     return (
-      <View style={styles.container}>
-        <Text>Veuillez vous connecter pour accéder aux recettes.</Text>
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <Text>Veuillez vous connecter pour accéder aux recettes.</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#ec6e5b" />
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#ec6e5b" />
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {recipe ? (
-        <>
-          <Text style={styles.title}>{recipe.title}</Text>
-          {recipe.image && (
-            <Image source={{ uri: recipe.image }} style={styles.image} />
-          )}
-          {recipe.instructions && recipe.instructions.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Instructions:</Text>
-              {recipe.instructions[0].steps?.map((step, i) => (
-                <Text key={i} style={styles.step}>
-                  {i + 1}. {step.step}
-                </Text>
-              ))}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {recipe ? (
+          <>
+            <Text style={styles.title}>{recipe.title}</Text>
+            {recipe.image && (
+              <Image source={{ uri: recipe.image }} style={styles.image} />
+            )}
+            {recipe.instructions && recipe.instructions.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Instructions:</Text>
+                {recipe.instructions[0].steps?.map((step, i) => (
+                  <Text key={i} style={styles.step}>
+                    {i + 1}. {step.step}
+                  </Text>
+                ))}
+              </View>
+            )}
+            <View style={styles.buttonWrapper}>
+              <Button
+                title="Nouvelle recette"
+                onPress={fetchRecipe}
+                color="#FFA85C"
+              />
             </View>
-          )}
-          <View style={styles.buttonWrapper}>
-            <Button
-              title="Nouvelle recette"
-              onPress={fetchRecipe}
-              color="#ec6e5b"
-            />
-          </View>
-        </>
-      ) : (
-        <Text>Aucune recette disponible</Text>
-      )}
-    </ScrollView>
+          </>
+        ) : (
+          <Text>Aucune recette disponible</Text>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flexGrow: 1,
     backgroundColor: "#fff",
