@@ -6,18 +6,14 @@ import { useAuth } from "@clerk/clerk-expo";
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
 
-import {
-  modifierValeur,
-  ajouterDefi,
-  supprimerDefi,
-  selectTousLesDefis,
-} from "../reducers/defis";
+import { modifierValeur, ajouterDefi, supprimerDefi } from "../reducers/defis";
 
 export default function HomeScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);
   const defisFixes = useSelector((state) => state.defis.fixes);
-  const tousLesDefis = useSelector(selectTousLesDefis);
-
+  const defisPersonnalises = useSelector((state) => state.defis.personnalises);
+  // ✅ Combinaison directe ici, plus besoin du sélecteur importé
+  const tousLesDefis = [...defisFixes, ...defisPersonnalises];
   const dispatch = useDispatch();
   const { getToken } = useAuth();
 
@@ -34,9 +30,7 @@ export default function HomeScreen({ navigation }) {
 
   const handleAjouter = () => {
     if (nomNouveauDefi.trim() === "") return;
-
     dispatch(ajouterDefi({ nom: nomNouveauDefi }));
-
     setNomNouveauDefi("");
     setModalVisible(false);
   };

@@ -24,6 +24,7 @@ export default function EventScreen() {
     (async () => {
       const result = await Location.requestForegroundPermissionsAsync();
       const status = result?.status;
+      console.log(status);
 
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync({});
@@ -31,11 +32,16 @@ export default function EventScreen() {
         //récupération des filtres pour Modal
         fetch("http://192.168.100.230:3000/events/categories")
           .then((res) => res.json())
-          .then((data) => setFilters(data));
+          .then((data) => {
+            console.log(data);
+
+            setFilters(data.token);
+          });
         setModalVisible(true);
       }
     })();
   }, []);
+  console.log(currentPosition);
 
   //chargement avant re-render composant sinon currentLocation null
   if (!currentPosition)
@@ -60,7 +66,7 @@ export default function EventScreen() {
     });
     const data = await response.json();
     // console.log("data => ", data.length);
-    setPlaces(data);
+    setPlaces(data.token);
   };
 
   const handleClickClose = () => {
