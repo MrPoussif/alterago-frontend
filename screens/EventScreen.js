@@ -5,20 +5,24 @@ import {
   Modal,
   Text,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
+import Slider from "@react-native-community/slider";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 export default function EventScreen() {
   const [currentPosition, setCurrentPosition] = useState(null); //état position actuelle
-  const [modalVisible, setModalVisible] = useState(false); //état visibilité de la Modal
+  const [fichesVisible, setFichesVisible] = useState(false); //état visibilité de la liste des adresses
+  const [ficheVisible, setFicheVisible] = useState(false); //état visibilité de la fiche de l'adresse selectionnée
   const [filters, setFilters] = useState([]); //état des filtres récupérés depuis backend
   const [selectedFilter, setSelectedFilter] = useState("manger"); //état du filtre sélectionné dans la Modal
   const [places, setPlaces] = useState([]);
-  const [radius, setRadius] = useState(1000); //état du rayon de recherche
+  const [radius, setRadius] = useState(100); //état du rayon de recherche
   const { getToken } = useAuth();
 
   //position actuelle
@@ -30,10 +34,10 @@ export default function EventScreen() {
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync({});
         location && setCurrentPosition(location.coords);
-        //récupération des filtres pour Modal
 
         const token = await getToken();
 
+        //récupération des filtres pour Modal
         const rawQuery = await fetch(
           "http://192.168.100.230:3000/events/categories",
           {
@@ -46,7 +50,6 @@ export default function EventScreen() {
         );
         const data = await rawQuery.json();
         setFilters(data);
-        setModalVisible(true);
       }
     })();
   }, []);
@@ -55,14 +58,13 @@ export default function EventScreen() {
   if (!currentPosition)
     return (
       <View style={styles.loading}>
-        <ActivityIndicator style={styles.actIndic} />
+        <ActivityIndicator style={{ size: "large" }} />
       </View>
     );
 
   //lancer la recherche
   const handleClickSearch = async () => {
     const token = await getToken();
-    // console.log("token =>", token);
     const response = await fetch("http://192.168.100.230:3000/events/nearby", {
       method: "POST",
       headers: {
@@ -77,19 +79,25 @@ export default function EventScreen() {
       }),
     });
     const data = await response.json();
-    console.log("data => ", data);
     setPlaces(data);
-    setModalVisible(false);
+    setFichesVisible(true);
   };
 
   //fermer la modal de recherche
-  const handleClickClose = () => {
-    setModalVisible(false);
+  const handleClickRestList = () => {
+    setFichesVisible(false);
+    setPlaces([]);
   };
 
   //ouvrir la modal de recherche
-  const handleClickOpen = () => {
-    setModalVisible(true);
+  const handleClickOpenFiche = () => {
+    setFichesVisible(false);
+    setFicheVisible(true);
+  };
+
+  const handleClickCloseFiche = () => {
+    setFichesVisible(true);
+    setFicheVisible(false);
   };
 
   //style minimaliste de la carte
@@ -128,39 +136,59 @@ export default function EventScreen() {
     );
   });
 
+  const fiches = places?.map((data, i) => {
+    return (
+      <TouchableOpacity
+        visible={fichesVisible}
+        key={i}
+        style={styles.fiche}
+        onPress={() => handleClickOpenFiche()}
+      >
+        <View>
+          <Text style={{ fontWeight: "bold" }}>{data.name}</Text>
+        </View>
+        <View>
+          <Text style={{ color: "#808080" }}>{data.address}</Text>
+        </View>
+        <View>
+          <Text style={{ color: "#808080" }}>{data.phone}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  });
+
+  // a revoir car toutes les fiches s'affichent lors du clic sur la fiche
+  const fiche = places?.map((data, i) => {
+    return (
+      <>
+        <View
+          visible={fichesVisible}
+          key={i}
+          style={styles.fiche}
+          onPress={() => handleClickOpenFiche()}
+        >
+          <View>
+            <Text style={{ fontWeight: "bold" }}>{data.name}</Text>
+          </View>
+          <View>
+            <Text style={{ color: "#808080" }}>{data.address}</Text>
+          </View>
+          <View>
+            <Text style={{ color: "#808080" }}>{data.phone}</Text>
+          </View>
+          <FontAwesome6
+            name="circle-xmark"
+            size={30}
+            color="#FFA85C"
+            onPress={() => handleClickCloseFiche()}
+          />
+        </View>
+      </>
+    );
+  });
+
   return (
     <View style={styles.container}>
-      <Modal visible={modalVisible} animationType="fade" transparent>
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Autour de moi</Text>
-              <TouchableOpacity
-                style={styles.closeBtn}
-                onPress={() => handleClickClose()}
-              >
-                <Text style={styles.textCloseBtn}>X</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.pickerView}>
-              <Picker
-                style={styles.picker}
-                mode="dropdown"
-                selectedValue={selectedFilter}
-                onValueChange={(value) => setSelectedFilter(value)}
-              >
-                {filtersList}
-              </Picker>
-            </View>
-            <TouchableOpacity
-              style={styles.searchBtn}
-              onPress={() => handleClickSearch()}
-            >
-              <Text style={styles.searchTextBtn}>SEARCH</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
       <MapView
         initialRegion={{
           latitude: currentPosition.latitude,
@@ -175,12 +203,51 @@ export default function EventScreen() {
       >
         {markers}
       </MapView>
-      <TouchableOpacity
-        style={styles.openModalBtn}
-        onPress={() => handleClickOpen()}
-      >
-        <Text style={styles.textOpenModal}>Rechercher</Text>
-      </TouchableOpacity>
+      {/* {modalVisible && ( */}
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalView}>
+          {fichesVisible && (
+            <>
+              <FontAwesome6
+                name="circle-xmark"
+                size={30}
+                color="#FFA85C"
+                onPress={() => handleClickRestList()}
+              />
+              <ScrollView style={styles.fiches}>{fiches}</ScrollView>
+            </>
+          )}
+          {ficheVisible && fiche}
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              selectedValue={selectedFilter}
+              onValueChange={(value) => setSelectedFilter(value)}
+            >
+              {filtersList}
+            </Picker>
+          </View>
+          <View style={styles.modalFooter}>
+            <Text>{radius / 1000}km</Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={100}
+              maximumValue={2000}
+              step={100}
+              value={radius}
+              onValueChange={(value) => setRadius(value)}
+            />
+            <TouchableOpacity
+              style={styles.searchBtn}
+              onPress={() => handleClickSearch()}
+            >
+              <FontAwesome6 name="magnifying-glass" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      {/* )} */}
     </View>
   );
 }
@@ -191,11 +258,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  actIndic: {
-    size: "large",
-  },
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  modalOverlay: {
+    position: "absolute",
+    // top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 5,
+    zIndex: 10,
+  },
+  modalView: {
+    width: "95%",
+    backgroundColor: "rgba(255,255,255,0.85)",
+    borderRadius: 10,
+    padding: 20,
+    gap: 10,
+    alignItems: "center",
+    justifyContent: "space-between",
+    elevation: 0,
   },
   modalHeader: {
     width: 200,
@@ -203,41 +289,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalView: {
-    height: "25%",
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 30,
-    alignItems: "center",
-    justifyContent: "space-between",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
   modalTitle: {
-    fontWeight: "bold",
-  },
-  closeBtn: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 20,
-    height: 20,
-    borderRadius: "50%",
-    backgroundColor: "#FFA85C",
-  },
-  textCloseBtn: {
-    color: "#ffffff",
     fontWeight: "bold",
   },
   pickerView: {
@@ -245,7 +297,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FFA85C",
     borderRadius: 20,
-    width: 200,
+    width: "100%",
   },
   picker: {
     height: 45,
@@ -254,20 +306,30 @@ const styles = StyleSheet.create({
   pickerItem: {
     fontSize: 10,
     height: 30,
-    // backgroundColor: "red",
+  },
+  modalFooter: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  slider: {
+    width: 200,
+    heigth: 40,
   },
   mapView: {
-    width: "100%",
-    height: "65%",
+    flex: 1,
   },
   searchBtn: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    width: 100,
-    height: 30,
-    borderRadius: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "#FFA85C",
+    zIndex: 3,
   },
   searchTextBtn: {
     color: "#ffffff",
@@ -288,5 +350,16 @@ const styles = StyleSheet.create({
   },
   eventsList: {
     flex: 1,
+  },
+  fiches: {
+    width: "100%",
+    height: 200,
+  },
+  fiche: {
+    borderWidth: 1,
+    borderColor: "#FFA85C",
+    borderRadius: 10,
+    width: "100%",
+    padding: 5,
   },
 });
