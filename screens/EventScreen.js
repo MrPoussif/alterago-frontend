@@ -17,11 +17,11 @@ import { FontAwesome6 } from "@expo/vector-icons";
 
 export default function EventScreen() {
   const [currentPosition, setCurrentPosition] = useState(null); //état position actuelle
-  const [fichesVisible, setFichesVisible] = useState(false); //état visibilité de la liste des adresses
-  const [ficheVisible, setFicheVisible] = useState(false); //état visibilité de la fiche de l'adresse selectionnée
+  const [fichesListVisible, setFichesListVisible] = useState(false); //état visibilité de la liste des adresses
+  const [ficheDetail, setFicheDetail] = useState(null); //état visibilité de la fiche de l'adresse selectionnée
   const [filters, setFilters] = useState([]); //état des filtres récupérés depuis backend
   const [selectedFilter, setSelectedFilter] = useState("manger"); //état du filtre sélectionné dans la Modal
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState([]); // état récupération des places via fetch google places lors de la recherche
   const [radius, setRadius] = useState(100); //état du rayon de recherche
   const { getToken } = useAuth();
 
@@ -30,7 +30,6 @@ export default function EventScreen() {
     (async () => {
       const result = await Location.requestForegroundPermissionsAsync();
       const status = result?.status;
-      console.log(status);
 
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync({});
@@ -54,7 +53,6 @@ export default function EventScreen() {
       }
     })();
   }, []);
-  console.log(currentPosition);
 
   //chargement avant re-render composant sinon currentLocation null
   if (!currentPosition)
@@ -82,24 +80,21 @@ export default function EventScreen() {
     });
     const data = await response.json();
     setPlaces(data);
-    setFichesVisible(true);
+    setFichesListVisible(true);
+    console.log("places =>", places);
   };
 
-  //fermer la modal de recherche
+  //fermer et reinitialiser la modale de recherche
   const handleClickRestList = () => {
-    setFichesVisible(false);
+    setFichesListVisible(false);
     setPlaces([]);
+    setFicheDetail(null);
+    setRadius(100);
   };
 
-  //ouvrir la modal de recherche
-  const handleClickOpenFiche = () => {
-    setFichesVisible(false);
-    setFicheVisible(true);
-  };
-
+  // bouton pour fermer le détail de la fiche
   const handleClickCloseFiche = () => {
-    setFichesVisible(true);
-    setFicheVisible(false);
+    setFicheDetail(null);
   };
 
   //style minimaliste de la carte
@@ -138,13 +133,14 @@ export default function EventScreen() {
     );
   });
 
-  const fiches = places?.map((data, i) => {
+  // liste des adresses trouvées
+  const fichesList = places?.map((data, i) => {
     return (
       <TouchableOpacity
-        visible={fichesVisible}
         key={i}
-        style={styles.fiche}
-        onPress={() => handleClickOpenFiche()}
+        visible={fichesListVisible}
+        style={styles.ficheList}
+        onPress={() => setFicheDetail(data)}
       >
         <View>
           <Text style={{ fontWeight: "bold" }}>{data.name}</Text>
@@ -153,31 +149,58 @@ export default function EventScreen() {
           <Text style={{ color: "#808080" }}>{data.address}</Text>
         </View>
         <View>
-          <Text style={{ color: "#808080" }}>{data.phone}</Text>
+          <Text style={{ color: "#808080" }}>{data.type}</Text>
         </View>
       </TouchableOpacity>
     );
   });
 
-  // a revoir car toutes les fiches s'affichent lors du clic sur la fiche
-  const fiche = places?.map((data, i) => {
+  const resetButton = (
+    <FontAwesome6
+      // visible={resetBtn}
+      name="circle-xmark"
+      size={30}
+      color="#FFA85C"
+      onPress={() => handleClickRestList()}
+    />
+  );
+
+  const horaires = ficheDetail?.hours.map((data, i) => {
     return (
-      <>
-        <View
-          visible={fichesVisible}
-          key={i}
-          style={styles.fiche}
-          onPress={() => handleClickOpenFiche()}
-        >
-          <View>
-            <Text style={{ fontWeight: "bold" }}>{data.name}</Text>
-          </View>
-          <View>
-            <Text style={{ color: "#808080" }}>{data.address}</Text>
-          </View>
-          <View>
-            <Text style={{ color: "#808080" }}>{data.phone}</Text>
-          </View>
+      <View key={i}>
+        <Text>{data}</Text>
+      </View>
+    );
+  });
+  // fiche détaillée de l'adresse selectionnée
+  const fiche = (
+    <View style={styles.fiche}>
+      <View style={styles.ficheInfoLogos}>
+        <View style={styles.logo}>
+          <FontAwesome6
+            name="user-group"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickCloseFiche()}
+          />
+        </View>
+        <View style={styles.logo}>
+          <FontAwesome6
+            name="diamond-turn-right"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickCloseFiche()}
+          />
+        </View>
+        <View style={styles.logo}>
+          <FontAwesome6
+            name="phone"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickCloseFiche()}
+          />
+        </View>
+        <View>
           <FontAwesome6
             name="circle-xmark"
             size={30}
@@ -185,9 +208,25 @@ export default function EventScreen() {
             onPress={() => handleClickCloseFiche()}
           />
         </View>
-      </>
-    );
-  });
+      </View>
+      <View style={styles.ficheInfo}>
+        <View>
+          <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+            {ficheDetail?.name}
+          </Text>
+          <Text style={{ fontWeight: "bold", fontSize: 10 }}>{horaires}</Text>
+        </View>
+        <>
+          <View style={styles.rating}>
+            <Text style={{ color: "#fff", fontSize: 30 }}>
+              {ficheDetail?.rating}
+            </Text>
+            <Text style={{ color: "#fff", fontSize: 20 }}>/5</Text>
+          </View>
+        </>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -205,21 +244,14 @@ export default function EventScreen() {
       >
         {markers}
       </MapView>
-      {/* {modalVisible && ( */}
       <View style={styles.modalOverlay}>
         <View style={styles.modalView}>
-          {fichesVisible && (
-            <>
-              <FontAwesome6
-                name="circle-xmark"
-                size={30}
-                color="#FFA85C"
-                onPress={() => handleClickRestList()}
-              />
-              <ScrollView style={styles.fiches}>{fiches}</ScrollView>
-            </>
+          {places.length > 0 && ficheDetail === null ? resetButton : <></>}
+          {ficheDetail === null ? (
+            <ScrollView style={styles.fichesList}>{fichesList}</ScrollView>
+          ) : (
+            fiche
           )}
-          {ficheVisible && fiche}
           <View style={styles.pickerView}>
             <Picker
               style={styles.picker}
@@ -266,7 +298,6 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     position: "absolute",
-    // top: 0,
     left: 0,
     right: 0,
     bottom: 0,
@@ -353,15 +384,54 @@ const styles = StyleSheet.create({
   eventsList: {
     flex: 1,
   },
-  fiches: {
+  fichesList: {
     width: "100%",
-    height: 200,
+    maxHeight: 200,
   },
-  fiche: {
+  ficheList: {
     borderWidth: 1,
     borderColor: "#FFA85C",
     borderRadius: 10,
     width: "100%",
     padding: 5,
+  },
+  fiche: {
+    // display: "flex",
+    // flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    maxWidth: "90%",
+  },
+  ficheInfoLogos: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "60%",
+  },
+  logo: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFA85C",
+    borderWidth: 2,
+    borderColor: "#FFA85C",
+    borderRadius: 5,
+    width: 40,
+    height: 30,
+  },
+  ficheInfo: {
+    display: "flex",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#FFA85C",
+    borderRadius: 10,
+    padding: 5,
+  },
+  rating: {
+    display: "flex",
+    flexDirection: "row",
+    width: 60,
+    height: 60,
+    borderRadius: 5,
+    backgroundColor: "#FFA85C",
   },
 });
