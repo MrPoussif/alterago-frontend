@@ -8,7 +8,15 @@ import {
   Image,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import {
+  updateUserId,
+  updateEmail,
+  updateFirstname,
+  updateLastname,
+  updateNickname,
+  updatePicture,
+} from "../reducers/user";
 
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
@@ -27,16 +35,46 @@ export default function HomeScreen({ navigation }) {
 
   const dispatch = useDispatch();
   const { getToken } = useAuth();
+  const user = useUser();
+  const email = user.user.emailAddresses[0].emailAddress;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [nomNouveauDefi, setNomNouveauDefi] = useState("");
 
+  const [nickname, setNickname] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [image, setImage] = useState("");
+
   useEffect(() => {
-    async function recupererToken() {
+    // récupération des informations user depuis la DB
+    (async () => {
       const token = await getToken();
-      console.log("Token Clerk :", token);
-    }
-    recupererToken();
+      const userRes = await fetch(
+        `http://192.168.100.117:3000/users/${user.user.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            //Envoi le token dans le header pour vérification par middleware dans le backend
+            authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const userData = await userRes.json();
+      // Enregistrement utilisateur dans redux
+      console.log("userData", userData.user);
+
+      if (userData) {
+        dispatch(updateUserId(userData.user.userId));
+        dispatch(updateNickname(userData.user.nickname));
+        dispatch(updateFirstname(userData.user.firstname));
+        dispatch(updateLastname(userData.user.lastname));
+        dispatch(updateEmail(email));
+        dispatch(updatePicture(userData.user.picture));
+      }
+      console.log("utilisateur", utilisateur);
+    })();
   }, []);
 
   // On calcule combien de défis sont complétés (valeur == max)
@@ -54,7 +92,6 @@ export default function HomeScreen({ navigation }) {
     dispatch(ajouterDefi({ nom: nomNouveauDefi }));
     setNomNouveauDefi("");
   };
-
   return (
     <View style={styles.conteneur}>
       {/* Icône settings alignée à droite, juste au dessus de la carte profil */}
@@ -68,9 +105,9 @@ export default function HomeScreen({ navigation }) {
       {/* Carte profil fixe — elle ne scroll pas avec les défis */}
       <View style={styles.carteProfile}>
         <View style={styles.photoProfile}>
-          {utilisateur.photo ? (
+          {utilisateur.picture ? (
             <Image
-              source={{ uri: utilisateur.photo }}
+              source={{ uri: utilisateur.picture }}
               style={styles.imageProfile}
             />
           ) : (
