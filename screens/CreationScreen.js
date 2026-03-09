@@ -39,7 +39,6 @@ export default function CreationScreen({ navigation }) {
   const user = useUser();
 
   useEffect(() => {
-    // console.log("use effect");
     console.log("user", user.user.id);
   }, []);
 
@@ -74,9 +73,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -101,9 +97,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -139,7 +132,6 @@ export default function CreationScreen({ navigation }) {
             type: "image/jpeg",
             name: `profile_${nickname}.jpg`,
           });
-
           formData.append("api_key", signatureData.apiKey);
           formData.append("timestamp", signatureData.timestamp);
           formData.append("signature", signatureData.signature);
@@ -179,9 +171,7 @@ export default function CreationScreen({ navigation }) {
             );
             const signupData = await signupRes.json();
             // console.log("data", signupData);
-
             signupData && alert(signupData.error);
-
             // redirige vers le dashboard
             navigation.navigate("TabNavigator");
           }
@@ -197,19 +187,15 @@ export default function CreationScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Image
-        source={{
-          uri: `${image}`,
-          // uri: `${avatars[avatarIndex]}`,
-        }}
+      <View
         style={{
-          width: 150,
-          height: 150,
-          marginBottom: 5,
-          borderRadius: 100,
+          flexDirection: "row",
+          alignItems: "center",
+          with: "100%",
+          borderColor: "red",
+          borderWith: "2",
         }}
-      />
-      <View style={styles.arrowsBox}>
+      >
         <TouchableOpacity onPress={() => handlePreviousPress()}>
           <FontAwesome
             name={"arrow-left"}
@@ -217,9 +203,26 @@ export default function CreationScreen({ navigation }) {
             color={"#FFA85C"}
           ></FontAwesome>
         </TouchableOpacity>
+        <Image
+          source={{
+            uri: `${image}`,
+          }}
+          style={{
+            width: 150,
+            height: 150,
+            marginBottom: 5,
+            borderRadius: 100,
+            marginHorizontal: 10,
+          }}
+        />
+        <TouchableOpacity onPress={() => handleNextPress()}>
+          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.iconsBox}>
         <TouchableOpacity onPress={() => handleUploadPress()}>
           <FontAwesome
-            name={"upload"}
+            name={"folder-open"}
             size={25}
             color={"#FFA85C"}
           ></FontAwesome>
@@ -230,9 +233,6 @@ export default function CreationScreen({ navigation }) {
             size={25}
             color={"#FFA85C"}
           ></FontAwesome>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleNextPress()}>
-          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
         </TouchableOpacity>
       </View>
       <TextInput
@@ -309,11 +309,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  arrowsBox: {
-    width: "60%",
+  iconsBox: {
+    width: "30%",
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    justifyContent: "space-around",
+    marginTop: 10,
   },
   input: {
     width: "70%",
@@ -360,10 +360,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   picker: {
-    // flex: 1,
     width: "100%",
-    // width: 120,
-    // height: 100,
     fontSize: 20,
   },
   pickerItem: {
