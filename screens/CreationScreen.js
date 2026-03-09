@@ -112,6 +112,7 @@ export default function CreationScreen({ navigation }) {
       try {
         //Récupère le token Clerk lié au user
         const token = await getToken();
+
         const signatureRes = await fetch(
           "http://192.168.100.117:3000/users/signature",
           {

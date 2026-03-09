@@ -45,7 +45,7 @@ export default function ConnexionScreen({ navigation }) {
         emailAddress: signUpEmail,
         password: signUpPassword,
       });
-      console.log(result);
+      console.log("RESULTAAAAAT", result);
 
       await setActiveSignUp({ session: result.createdSessionId });
 
