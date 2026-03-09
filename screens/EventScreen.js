@@ -6,8 +6,10 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  Linking,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
 import Slider from "@react-native-community/slider";
@@ -23,6 +25,7 @@ export default function EventScreen() {
   const [selectedFilter, setSelectedFilter] = useState("manger"); //état du filtre sélectionné dans la Modal
   const [places, setPlaces] = useState([]); // état récupération des places via fetch google places lors de la recherche
   const [radius, setRadius] = useState(100); //état du rayon de recherche
+  const [ShowTheRoad, setShowTheRoad] = useState(false); // état d'affichage de l'itinéraire
   const { getToken } = useAuth();
 
   //position actuelle
@@ -81,7 +84,7 @@ export default function EventScreen() {
     const data = await response.json();
     setPlaces(data);
     setFichesListVisible(true);
-    console.log("places =>", places);
+    // console.log("places =>", places);
   };
 
   //fermer et reinitialiser la modale de recherche
@@ -95,6 +98,23 @@ export default function EventScreen() {
   // bouton pour fermer le détail de la fiche
   const handleClickCloseFiche = () => {
     setFicheDetail(null);
+  };
+
+  // bouton partager
+  const handleClickShare = () => {
+    console.log("Share");
+  };
+
+  // bouton itinéraire
+  const handleClickGo = () => {
+    console.log("Go", ficheDetail.latitude);
+    setShowTheRoad(true);
+  };
+
+  // bouton appeler
+  const handleClickCall = async () => {
+    await Linking.openURL("tel:", ficheDetail?.phone);
+    // console.log(ficheDetail.phone);
   };
 
   //style minimaliste de la carte
@@ -155,6 +175,7 @@ export default function EventScreen() {
     );
   });
 
+  // reset de la recherche
   const resetButton = (
     <FontAwesome6
       // visible={resetBtn}
@@ -165,6 +186,7 @@ export default function EventScreen() {
     />
   );
 
+  // horaires de l'adresse choisie
   const horaires = ficheDetail?.hours.map((data, i) => {
     return (
       <View key={i}>
@@ -172,18 +194,34 @@ export default function EventScreen() {
       </View>
     );
   });
+
   // fiche détaillée de l'adresse selectionnée
   const fiche = (
     <View style={styles.fiche}>
       <View style={styles.ficheInfoLogos}>
         <View style={styles.logo}>
-          <FontAwesome6 name="user-group" size={20} color="#fff" />
+          <FontAwesome6
+            name="user-group"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickShare()}
+          />
         </View>
         <View style={styles.logo}>
-          <FontAwesome6 name="diamond-turn-right" size={20} color="#fff" />
+          <FontAwesome6
+            name="diamond-turn-right"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickGo()}
+          />
         </View>
         <View style={styles.logo}>
-          <FontAwesome6 name="phone" size={20} color="#fff" />
+          <FontAwesome6
+            name="phone"
+            size={20}
+            color="#fff"
+            onPress={() => handleClickCall()}
+          />
         </View>
         <View>
           <FontAwesome6
@@ -213,6 +251,23 @@ export default function EventScreen() {
     </View>
   );
 
+  // itinéraire de l'adresse choisie
+  const onTheRoad = (
+    <MapViewDirections
+      origin={{
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude,
+      }}
+      destination={{
+        latitude: ficheDetail?.latitude,
+        longitude: ficheDetail?.longitude,
+      }}
+      apikey={process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API_Key}
+      strokeWidth={4}
+      strokeColor="#FFA85C"
+    />
+  );
+
   return (
     <View style={styles.container}>
       <MapView
@@ -228,6 +283,22 @@ export default function EventScreen() {
         customMapStyle={ultraMinimal}
       >
         {markers}
+        {ShowTheRoad && ficheDetail && (
+          <MapViewDirections
+            origin={{
+              latitude: currentPosition.latitude,
+              longitude: currentPosition.longitude,
+            }}
+            destination={{
+              latitude: ficheDetail.latitude,
+              longitude: ficheDetail.longitude,
+            }}
+            apikey="AIzaSyCl3gaV3TZxVLAeAyi10FtGl27kvucz3uk"
+            mode="WALKING"
+            strokeWidth={4}
+            strokeColor="#FFA85C"
+          />
+        )}
       </MapView>
       <View style={styles.modalOverlay}>
         <View style={styles.modalView}>
