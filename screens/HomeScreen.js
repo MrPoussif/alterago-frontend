@@ -50,11 +50,6 @@ export default function HomeScreen({ navigation }) {
     // récupération des informations user depuis la DB
     (async () => {
       const token = await getToken();
-<<<<<<< HEAD
-      console.log("Token Clerk :", token);
-    }
-    recupererToken();
-=======
       const userRes = await fetch(
         `http://192.168.100.117:3000/users/${user.user.id}`,
         {
@@ -80,7 +75,6 @@ export default function HomeScreen({ navigation }) {
       }
       console.log("utilisateur", utilisateur);
     })();
->>>>>>> 54ba7c70b3d73f0aba7569f5708496652e7611ee
   }, []);
 
   // On calcule combien de défis sont complétés (valeur == max)
