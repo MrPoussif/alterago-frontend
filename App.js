@@ -1,3 +1,4 @@
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,6 +15,8 @@ import HomeScreen from "./screens/HomeScreen";
 import GameScreen from "./screens/GameScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import RecipeScreen from "./screens/RecipeScreen";
+import FavoriteScreen from "./screens/FavoriteScreen"; // 🆕
+import FavoriteDetailScreen from "./screens/FavoriteDetailScreen"; // 🆕
 
 // Redux
 import { Provider } from "react-redux";
@@ -59,27 +62,29 @@ const TabNavigator = () => {
       <Tab.Screen name="Event" component={EventScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Social" component={SocialScreen} />
-      {/* Recipe garde la tab bar mais n'apparaît pas dans les onglets */}
+
+      {/* Ces écrans sont dans le Tab pour garder la barre de navigation en bas */}
+      {/* tabBarButton: () => null les cache des onglets mais ils restent accessibles */}
       <Tab.Screen
         name="Recipe"
         component={RecipeScreen}
-        options={{
-          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
-        }}
+        options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
         name="Game"
         component={GameScreen}
-        options={{
-          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
-        }}
+        options={{ tabBarButton: () => null }}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{
-          tabBarButton: () => null, // ← cache l'onglet sans retirer l'écran
-        }}
+        options={{ tabBarButton: () => null }}
+      />
+      {/* FavoriteScreen dans le Tab pour garder la barre de navigation */}
+      <Tab.Screen
+        name="Favorite"
+        component={FavoriteScreen}
+        options={{ tabBarButton: () => null }}
       />
     </Tab.Navigator>
   );
@@ -104,6 +109,11 @@ export default function App() {
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Game" component={GameScreen} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
+              {/* Détail d'une recette favorite — dans le Stack pour pas avoir la tab bar */}
+              <Stack.Screen
+                name="FavoriteDetail"
+                component={FavoriteDetailScreen}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaView>

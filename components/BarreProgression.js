@@ -4,24 +4,33 @@ import { View, Text, StyleSheet } from "react-native";
 export default function BarreProgression({ defi }) {
   const { valeur, max } = defi;
 
+  // Calcul du pourcentage de remplissage de la barre
   const pourcentage = (valeur / max) * 100;
 
   const afficherValeur = () => {
     if (defi.id === "hydratation") {
-      return `${(valeur / 1000).toFixed(1)}/${defi.maxAffiche}L`;
+      // On divise valeur ET max par 1000 pour avoir des litres
+      // Comme ça si le max change à 3000ml, ça affiche bien 3L
+      const valeurEnLitres = (valeur / 1000).toFixed(1);
+      const maxEnLitres = (max / 1000).toFixed(1);
+      return `${valeurEnLitres}L / ${maxEnLitres}L`;
     }
 
     if (defi.id === "pas") {
-      return `${valeur}/${defi.maxAffiche} pas`;
+      // On utilise max directement — si l'objectif change, l'affichage suit
+      return `${valeur} / ${max} pas`;
     }
 
-    return `${valeur}/${max}`;
+    // Défis personnalisés — affichage simple
+    return `${valeur} / ${max}`;
   };
 
   return (
     <View>
+      {/* Valeur affichée en dessous du nom du défi */}
       <Text style={styles.texteValeur}>{afficherValeur()}</Text>
 
+      {/* Barre de progression */}
       <View style={styles.fond}>
         <View style={[styles.remplissage, { width: pourcentage + "%" }]} />
       </View>
