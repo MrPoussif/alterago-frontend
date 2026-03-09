@@ -36,9 +36,11 @@ export default function CreationScreen({ navigation }) {
   const [avatarIndex, setAvatarIndex] = useState(0);
   const [image, setImage] = useState(avatars[avatarIndex]);
   const { getToken } = useAuth();
+  const user = useUser();
 
   useEffect(() => {
     // console.log("use effect");
+    console.log("user", user.user.id);
   }, []);
 
   const handlePreviousPress = () => {
@@ -112,7 +114,6 @@ export default function CreationScreen({ navigation }) {
       try {
         //Récupère le token Clerk lié au user
         const token = await getToken();
-
         const signatureRes = await fetch(
           "http://192.168.100.117:3000/users/signature",
           {
@@ -166,6 +167,7 @@ export default function CreationScreen({ navigation }) {
                   authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
+                  userId: user.user.id,
                   nickname,
                   firstname,
                   lastname,

@@ -11,6 +11,8 @@ import {
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import PwdInput from "../components/pwdInput";
 
 export default function SettingsScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);
@@ -22,6 +24,7 @@ export default function SettingsScreen({ navigation }) {
   const [pwdModalVisible, setPwdModalVisible] = useState(false);
   const [emailModalVisible, setEmailModalVisible] = useState(false);
 
+  //* CHANGEMENT MOT DE PASSE  ******************
   const handleUpdatePassword = async () => {
     console.log("Update password");
     //TODO Modale pour changer de mot de passe
@@ -35,6 +38,7 @@ export default function SettingsScreen({ navigation }) {
     setPwdModalVisible(false);
     console.log("Confirm new password");
   };
+  //* CHANGEMENT EMAIL  *****************************
   const handleUpdateEmail = async () => {
     console.log("Update email");
     setEmailModalVisible(true);
@@ -49,10 +53,11 @@ export default function SettingsScreen({ navigation }) {
     console.log("Confirm new email");
     await user.createEmailAddress({ emailAddress: newEmail });
   };
-  //TODO Changer d'image
 
+  //TODO Changer d'image
   //TODO changer de pseudo
 
+  //* DECONNEXION  *****************************
   const handleSignoutPress = async () => {
     await signOut();
     navigation.navigate("Connexion");
@@ -86,18 +91,34 @@ export default function SettingsScreen({ navigation }) {
             >
               <Text style={styles.modalTitle}>Changer de mot de passe</Text>
               <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ancien mot de passe"
-                  onChangeText={(value) => setCurrPwd(value)}
-                  value={currPwd}
-                ></TextInput>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nouveau mot de passe"
-                  onChangeText={(value) => setNewPwd(value)}
-                  value={newPwd}
-                ></TextInput>
+                <View style={styles.inputRow}>
+                  <PwdInput newPwd={newPwd} setNewPwd={setNewPwd}></PwdInput>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ancien mot de passe"
+                    onChangeText={(value) => setCurrPwd(value)}
+                    value={currPwd}
+                    autoComplete={"current-password"}
+                    secureTextEntry={true}
+                  ></TextInput>
+                  <FontAwesome
+                    name={"eye-slash"}
+                    size={20}
+                    color={"#07905C"}
+                    onPres={() => handleIconPress()}
+                  />
+                </View>
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nouveau mot de passe"
+                    onChangeText={(value) => setNewPwd(value)}
+                    value={newPwd}
+                    autoComplete={"new-password"}
+                    secureTextEntry={true}
+                  ></TextInput>
+                  <FontAwesome name={"eye-slash"} size={20} color={"#07905C"} />
+                </View>
               </View>
               <TouchableOpacity
                 style={styles.buttonConfirm}
@@ -123,7 +144,7 @@ export default function SettingsScreen({ navigation }) {
               style={styles.modalContainer}
               onPress={(e) => e.stopPropagation()}
             >
-              <Text style={styles.modalTitle}>Changer de mot d'email</Text>
+              <Text style={styles.modalTitle}>Changer de d'email</Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
@@ -223,13 +244,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     height: "50%",
   },
-  input: {
-    width: "70%",
-    paddingBottom: 5,
-    borderBottomColor: "#07905C",
-    borderBottomWidth: 1,
-    fontSize: 18,
-  },
+
   buttonConfirm: {
     backgroundColor: "#FFA85C",
     borderRadius: 30,
