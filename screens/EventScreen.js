@@ -177,28 +177,13 @@ export default function EventScreen() {
     <View style={styles.fiche}>
       <View style={styles.ficheInfoLogos}>
         <View style={styles.logo}>
-          <FontAwesome6
-            name="user-group"
-            size={20}
-            color="#fff"
-            onPress={() => handleClickCloseFiche()}
-          />
+          <FontAwesome6 name="user-group" size={20} color="#fff" />
         </View>
         <View style={styles.logo}>
-          <FontAwesome6
-            name="diamond-turn-right"
-            size={20}
-            color="#fff"
-            onPress={() => handleClickCloseFiche()}
-          />
+          <FontAwesome6 name="diamond-turn-right" size={20} color="#fff" />
         </View>
         <View style={styles.logo}>
-          <FontAwesome6
-            name="phone"
-            size={20}
-            color="#fff"
-            onPress={() => handleClickCloseFiche()}
-          />
+          <FontAwesome6 name="phone" size={20} color="#fff" />
         </View>
         <View>
           <FontAwesome6

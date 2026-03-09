@@ -34,7 +34,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     async function recupererToken() {
       const token = await getToken();
-      // console.log("Token Clerk :", token);
+      console.log("Token Clerk :", token);
     }
     recupererToken();
   }, []);
