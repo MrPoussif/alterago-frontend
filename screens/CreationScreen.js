@@ -13,8 +13,7 @@ import {
 import React, { useEffect, useState } from "react";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
-import GenderSelect from "../components/GenderSelect";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import * as ImagePicker from "expo-image-picker";
 
 //Avatars issus du dossier AlterAgo/avatars sur cloudinary
@@ -37,22 +36,24 @@ export default function CreationScreen({ navigation }) {
   const [avatarIndex, setAvatarIndex] = useState(0);
   const [image, setImage] = useState(avatars[avatarIndex]);
   const { getToken } = useAuth();
-  // useEffect(() => {
-  //   console.log("use effect");
-  // }, []);
+
+  useEffect(() => {
+    // console.log("use effect");
+  }, []);
+
   const handlePreviousPress = () => {
     avatarIndex === 0
       ? setAvatarIndex(avatars.length - 1)
       : setAvatarIndex(avatarIndex - 1);
     setImage(avatars[avatarIndex]);
   };
-
   const handleNextPress = () => {
     avatarIndex === avatars.length - 1
       ? setAvatarIndex(0)
       : setAvatarIndex(avatarIndex + 1);
     setImage(avatars[avatarIndex]);
   };
+  //Importer une photo depuis le téléphone
   const handleUploadPress = () => {
     console.log("UPLOAD");
     (async () => {
@@ -72,13 +73,14 @@ export default function CreationScreen({ navigation }) {
         quality: 0.4,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
     })();
   };
+  // Prendre une photo
   const handleCameraPress = () => {
     console.log("CAMERA");
     (async () => {
@@ -150,36 +152,40 @@ export default function CreationScreen({ navigation }) {
             },
           );
           const cloudData = await response.json();
-          console.log(cloudData);
+          console.log("cloudData:", cloudData.url);
+          if (cloudData) {
+            setImage(cloudData.url);
+            // Appel route enregistrement de user sur mongoDB
+            const signupRes = await fetch(
+              "http://192.168.100.117:3000/users/signup",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  //Envoi le token dans le header pour vérification par middleware dans le backend
+                  authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  nickname,
+                  firstname,
+                  lastname,
+                  age: Number(age),
+                  gender,
+                  picture: cloudData.url,
+                }),
+              },
+            );
+            const signupData = await signupRes.json();
+            console.log("data", signupData);
+
+            signupData
+              ? alert(signupData.error)
+              : console.log("Nouvel utilisateur enregistré");
+
+            // redirige vers le dashboard
+            navigation.navigate("TabNavigator");
+          }
         }
-        // Appel route enregistrement de user sur mongoDB
-        const signupRes = await fetch(
-          "http://192.168.100.117:3000/users/signup",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              //Envoi le token dans le header pour vérification par middleware dans le backend
-              authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              nickname,
-              firstname,
-              lastname,
-              age: Number(age),
-              gender,
-              picture: avatars[avatarIndex],
-            }),
-          },
-        );
-        const signupData = await signupRes.json();
-        console.log("data", signupData);
-
-        signupData
-          ? alert(signupData.error)
-          : console.log("Nouvel utilisateur enregistré");
-
-        navigation.navigate("TabNavigator");
       } catch (error) {
         console.error("Error:", error);
       }
