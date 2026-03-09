@@ -22,10 +22,6 @@ export default function SettingsScreen({ navigation }) {
   const [pwdModalVisible, setPwdModalVisible] = useState(false);
   const [emailModalVisible, setEmailModalVisible] = useState(false);
 
-  const handleSignoutPress = async () => {
-    await signOut();
-    navigation.navigate("Connexion");
-  };
   const handleUpdatePassword = async () => {
     console.log("Update password");
     //TODO Modale pour changer de mot de passe
@@ -52,6 +48,14 @@ export default function SettingsScreen({ navigation }) {
     setEmailModalVisible(false);
     console.log("Confirm new email");
     await user.createEmailAddress({ emailAddress: newEmail });
+  };
+  //TODO Changer d'image
+
+  //TODO changer de pseudo
+
+  const handleSignoutPress = async () => {
+    await signOut();
+    navigation.navigate("Connexion");
   };
   return (
     <View style={styles.container}>

@@ -109,6 +109,7 @@ export default function ConnexionScreen({ navigation }) {
         value={signInEmail}
         style={styles.input}
         autoComplete={"email"}
+        inputMode={"email"}
       />
       <TextInput
         placeholder="Password"
@@ -116,6 +117,7 @@ export default function ConnexionScreen({ navigation }) {
         value={signInPassword}
         style={styles.input}
         autoComplete={"current-password"}
+        secureTextEntry={true}
       />
       <TouchableOpacity
         onPress={() => onSignInPress()}
@@ -132,6 +134,7 @@ export default function ConnexionScreen({ navigation }) {
         value={signUpEmail}
         style={styles.input}
         autoComplete={"email"}
+        inputMode={"email"}
       />
       <TextInput
         placeholder="Password"
@@ -139,6 +142,7 @@ export default function ConnexionScreen({ navigation }) {
         value={signUpPassword}
         style={styles.input}
         autoComplete={"new-password"}
+        secureTextEntry={true}
       />
       <TouchableOpacity
         onPress={() => onSignUpPress()}
