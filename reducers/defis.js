@@ -35,6 +35,12 @@ const initialState = {
   personnalises: [],
 };
 
+const iconesMap = {
+  Écriture: "✍️",
+  Lecture: "📚",
+  Musique: "🎶",
+};
+
 /* ---------------- Slice Redux ---------------- */
 const defisSlice = createSlice({
   name: "defis",
@@ -69,9 +75,11 @@ const defisSlice = createSlice({
         id: Date.now().toString(),
         nom: nom,
         valeur: 0,
-        max: 100,
+        max: nom !== "Musique" ? 5 : 30,
+        unite: nom !== "Musique" ? "pages" : "min",
         min: 0,
-        pas: 10,
+        pas: 1,
+        icone: iconesMap[nom],
       });
     },
 
@@ -88,12 +96,16 @@ const defisSlice = createSlice({
     modifierMax: (state, action) => {
       const { id, nouveauMax } = action.payload;
 
-      // On cherche le défi fixe par son id
+      // On cherche le défi par son id
       const defi = state.fixes.find((d) => d.id === id);
+      const defiPerso = state.personnalises.find((p) => p.id === id);
 
       // Si on le trouve, on change son max
       if (defi) {
         defi.max = nouveauMax;
+      }
+      if (defiPerso) {
+        defiPerso.max = nouveauMax;
       }
     },
   },

@@ -230,7 +230,7 @@ export default function RecipeScreen({ navigation }) {
     <View style={styles.safeArea}>
       <Header title="RECETTE" navigation={navigation} />
       <ScrollView contentContainerStyle={styles.container}>
-        {recipe ? (
+        {recette ? (
           <>
             {/* Titre + bouton cœur */}
             <View style={styles.headerRecette}>
