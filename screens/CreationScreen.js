@@ -194,44 +194,46 @@ export default function CreationScreen({ navigation }) {
         showVide={false}
       />
       <View style={styles.profilePic}>
+        <TouchableOpacity onPress={() => handlePreviousPress()}>
+          <FontAwesome
+            name={"arrow-left"}
+            size={30}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
         <Image
           source={{
             uri: `${image}`,
-            // uri: `${avatars[avatarIndex]}`,
           }}
           style={{
             width: 150,
             height: 150,
             marginBottom: 5,
             borderRadius: 100,
+            borderWidth: 5,
+            borderColor: "#1B4965",
+            marginHorizontal: 15,
           }}
         />
-        <View style={styles.arrowsBox}>
-          <TouchableOpacity onPress={() => handlePreviousPress()}>
-            <FontAwesome
-              name={"arrow-left"}
-              size={30}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleUploadPress()}>
-            <FontAwesome
-              name={"upload"}
-              size={25}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleCameraPress()}>
-            <FontAwesome
-              name={"camera"}
-              size={25}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleNextPress()}>
-            <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => handleNextPress()}>
+          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.iconsBox}>
+        <TouchableOpacity onPress={() => handleUploadPress()}>
+          <FontAwesome
+            name={"folder-open"}
+            size={25}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleCameraPress()}>
+          <FontAwesome
+            name={"camera"}
+            size={25}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
       </View>
       <View style={styles.informations}>
         <TextInput
@@ -307,12 +309,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    // justifyContent: "center",
   },
   profilePic: {
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
-    marginVertical: 30,
+    marginTop: 30,
+    flexDirection: "row",
   },
   iconsBox: {
     width: "30%",
@@ -367,9 +370,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "45%",
     height: 50,
+    justifyContent: "center",
+    padding: 0,
   },
   picker: {
-    width: "100%",
+    width: 120,
     fontSize: 20,
   },
   pickerItem: {

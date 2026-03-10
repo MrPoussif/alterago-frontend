@@ -2,6 +2,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Modal,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -13,7 +14,7 @@ import { useSelector } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import PwdInput from "../components/PwdInput";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import PwdInput from "../components/PwdInput";
+import Header from "../components/common/Header";
 
 export default function SettingsScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);
@@ -84,9 +85,22 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.btnTxt}>Changer de mot de passe</Text>
         </TouchableOpacity>
         <Modal visible={pwdModalVisible} transparent animationType="none">
-          <View style={styles.behindModalBg}>
-            <View style={styles.modalContainer}>
-              <View style={{ alignItems: "flex-end", width: "80%" }}>
+          <Pressable
+            style={styles.behindModalBg}
+            // style={StyleSheet.absoluteFillObject} // ← couvre tout l'écran
+            onPress={() => setPwdModalVisible(false)}
+          >
+            <View
+              style={styles.modalContainer}
+              //stop la propagation de l'event onPress parent
+              onStartShouldSetResponder={() => true}
+            >
+              <View
+                style={{
+                  alignItems: "flex-end",
+                  width: "95%",
+                }}
+              >
                 <FontAwesome
                   name={"close"}
                   size={25}
@@ -117,7 +131,7 @@ export default function SettingsScreen({ navigation }) {
                 <Text style={styles.btnTxt}>Confirmer</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Pressable>
         </Modal>
         <TouchableOpacity
           style={styles.button}
@@ -126,9 +140,17 @@ export default function SettingsScreen({ navigation }) {
           <Text style={styles.btnTxt}>Changer d'email</Text>
         </TouchableOpacity>
         <Modal visible={emailModalVisible} transparent animationType="none">
-          <View style={styles.behindModalBg}>
-            <View style={styles.modalContainer}>
-              <View style={{ alignItems: "flex-end", width: "80%" }}>
+          <Pressable
+            style={styles.behindModalBg}
+            onPress={() => setEmailModalVisible(false)}
+          >
+            <View
+              style={styles.modalContainer}
+              //stop la propagation de l'event onPress parent
+
+              onStartShouldSetResponder={() => true}
+            >
+              <View style={{ alignItems: "flex-end", width: "95%" }}>
                 <FontAwesome
                   name={"close"}
                   size={25}
@@ -154,7 +176,7 @@ export default function SettingsScreen({ navigation }) {
                 <Text style={styles.btnTxt}>Confirmer</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Pressable>
         </Modal>
       </View>
       <View style={styles.bloc}>
@@ -215,6 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: 500,
   },
   behindModalBg: {
+    marginTop: 36,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     flex: 1,
     justifyContent: "center",
@@ -227,7 +250,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 30,
+    marginBottom: 36,
+    paddingBottom: 30,
+    paddingTop: 5,
   },
   modalTitle: {
     fontSize: 20,

@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import React from "react";
 
 export default function Header({
   title,
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingHorizontal: 30,
     paddingBottom: 5,
-    // marginBottom: 30,
     backgroundColor: "#1B4965",
     borderBottomWidth: 1,
     borderBottomColor: "#F0EDE8",
