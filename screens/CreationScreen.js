@@ -36,9 +36,11 @@ export default function CreationScreen({ navigation }) {
   const [avatarIndex, setAvatarIndex] = useState(0);
   const [image, setImage] = useState(avatars[avatarIndex]);
   const { getToken } = useAuth();
+  const user = useUser();
 
   useEffect(() => {
     // console.log("use effect");
+    console.log("user", user.user.id);
   }, []);
 
   const handlePreviousPress = () => {
@@ -100,7 +102,7 @@ export default function CreationScreen({ navigation }) {
         quality: 0.4,
       });
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
         setImage(result.assets[0].uri);
@@ -112,7 +114,6 @@ export default function CreationScreen({ navigation }) {
       try {
         //Récupère le token Clerk lié au user
         const token = await getToken();
-
         const signatureRes = await fetch(
           "http://192.168.100.117:3000/users/signature",
           {
@@ -127,7 +128,7 @@ export default function CreationScreen({ navigation }) {
         const signatureData = await signatureRes.json();
         if (signatureData) {
           console.log("signature valid");
-          console.log(signatureData);
+          // console.log(signatureData);
           console.log("image", image);
           //upload vers cloudinary et récupération URL (fetch route post api cloudinary)
           //création formdata pour envoyer image à cloudinary
@@ -166,6 +167,7 @@ export default function CreationScreen({ navigation }) {
                   authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
+                  userId: user.user.id,
                   nickname,
                   firstname,
                   lastname,
@@ -176,11 +178,9 @@ export default function CreationScreen({ navigation }) {
               },
             );
             const signupData = await signupRes.json();
-            console.log("data", signupData);
+            // console.log("data", signupData);
 
-            signupData
-              ? alert(signupData.error)
-              : console.log("Nouvel utilisateur enregistré");
+            signupData && alert(signupData.error);
 
             // redirige vers le dashboard
             navigation.navigate("TabNavigator");

@@ -42,43 +42,56 @@ export default function HomeScreen({ navigation }) {
 
   const dispatch = useDispatch();
   const { getToken } = useAuth();
-  const user = useUser();
-  const email = user.user.emailAddresses[0].emailAddress;
+  const { isLoaded, isSignedIn, user } = useUser();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [nomNouveauDefi, setNomNouveauDefi] = useState("");
 
-  const [nickname, setNickname] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [image, setImage] = useState("");
+  // const [nickname, setNickname] = useState("");
+  // const [firstname, setFirstname] = useState("");
+  // const [lastname, setLastname] = useState("");
+  // const [image, setImage] = useState("");
 
   const [modalObjectifVisible, setModalObjectifVisible] = useState(false);
   const [defiSelectionne, setDefiSelectionne] = useState(null);
   const [nouvelObjectif, setNouvelObjectif] = useState("");
 
   useEffect(() => {
+    if (!isLoaded) return null;
+    if (!isSignedIn) {
+      navigation.navigate("Connexion");
+      return null;
+    }
+    // récupération des informations user depuis la DB
     (async () => {
-      const token = await getToken();
-      const userRes = await fetch(
-        `http://192.168.100.117:3000/users/${user.user.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
+      try {
+        const token = await getToken();
+        const userRes = await fetch(
+          `http://192.168.100.117:3000/users/${user.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              //Envoi le token dans le header pour vérification par middleware dans le backend
+              authorization: `Bearer ${token}`,
+            },
           },
-        },
-      );
-      const userData = await userRes.json();
+        );
+        console.log("coucou2");
+        const userData = await userRes.json();
+        // Enregistrement utilisateur dans redux
+        userData && console.log("userData", userData.user);
 
-      if (userData) {
-        dispatch(updateUserId(userData.user.userId));
-        dispatch(updateNickname(userData.user.nickname));
-        dispatch(updateFirstname(userData.user.firstname));
-        dispatch(updateLastname(userData.user.lastname));
-        dispatch(updateEmail(email));
-        dispatch(updatePicture(userData.user.picture));
+        if (userData) {
+          dispatch(updateUserId(userData.user.userId));
+          dispatch(updateNickname(userData.user.nickname));
+          dispatch(updateFirstname(userData.user.firstname));
+          dispatch(updateLastname(userData.user.lastname));
+          dispatch(updatePicture(userData.user.picture));
+        }
+        console.log("utilisateur", utilisateur);
+      } catch (error) {
+        console.error("Erreur:", error);
       }
     })();
   }, []);
