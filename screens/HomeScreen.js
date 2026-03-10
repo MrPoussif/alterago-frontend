@@ -6,6 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Modal,
+  TextInput,
+  Alert,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
@@ -20,17 +23,22 @@ import {
 
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
+import Header from "../components/common/Header";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-import { modifierValeur, ajouterDefi, supprimerDefi } from "../reducers/defis";
+import {
+  modifierValeur,
+  ajouterDefi,
+  supprimerDefi,
+  modifierMax,
+} from "../reducers/defis";
 
 export default function HomeScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);
   const defisFixes = useSelector((state) => state.defis.fixes);
   const defisPersonnalises = useSelector((state) => state.defis.personnalises);
 
-  // On combine les deux listes pour afficher tout d'un coup
   const tousLesDefis = [...defisFixes, ...defisPersonnalises];
 
   const dispatch = useDispatch();
@@ -44,6 +52,10 @@ export default function HomeScreen({ navigation }) {
   // const [firstname, setFirstname] = useState("");
   // const [lastname, setLastname] = useState("");
   // const [image, setImage] = useState("");
+
+  const [modalObjectifVisible, setModalObjectifVisible] = useState(false);
+  const [defiSelectionne, setDefiSelectionne] = useState(null);
+  const [nouvelObjectif, setNouvelObjectif] = useState("");
 
   useEffect(() => {
     if (!isLoaded) return null;
@@ -85,11 +97,31 @@ export default function HomeScreen({ navigation }) {
     })();
   }, []);
 
-  // On calcule combien de défis sont complétés (valeur == max)
+  const ouvrirModalObjectif = (defi) => {
+    setDefiSelectionne(defi);
+    setNouvelObjectif(String(defi.max));
+    setModalObjectifVisible(true);
+  };
+
+  const validerObjectif = () => {
+    const valeurNumerique = parseInt(nouvelObjectif);
+    if (isNaN(valeurNumerique) || valeurNumerique <= 0) {
+      Alert.alert("Erreur", "Saisis un nombre valide et supérieur à 0");
+      return;
+    }
+
+    dispatch(
+      modifierMax({ id: defiSelectionne.id, nouveauMax: valeurNumerique }),
+    );
+
+    setModalObjectifVisible(false);
+    setDefiSelectionne(null);
+    setNouvelObjectif("");
+  };
+
   const defisCompletes = tousLesDefis.filter((d) => d.valeur >= d.max).length;
   const totalDefis = tousLesDefis.length;
 
-  // Pourcentage global de progression sur tous les défis
   const progressionGlobale =
     totalDefis === 0
       ? 0
@@ -100,16 +132,10 @@ export default function HomeScreen({ navigation }) {
     dispatch(ajouterDefi({ nom: nomNouveauDefi }));
     setNomNouveauDefi("");
   };
+
   return (
     <View style={styles.conteneur}>
-      {/* Icône settings alignée à droite, juste au dessus de la carte profil */}
-      <TouchableOpacity
-        style={styles.boutonIconeHaut}
-        onPress={() => navigation.navigate("Settings")}
-      >
-        <FontAwesome name="gear" size={30} color="#FFA85C" />
-      </TouchableOpacity>
-
+      <Header title="HOME" navigation={navigation} />
       {/* Carte profil fixe — elle ne scroll pas avec les défis */}
       <View style={styles.carteProfile}>
         <View style={styles.photoProfile}>
@@ -131,7 +157,6 @@ export default function HomeScreen({ navigation }) {
           {utilisateur.nickname || "Utilisateur"}
         </Text>
 
-        {/* Barre de progression globale basée sur tous les défis */}
         <View style={styles.progressionGlobaleFond}>
           <View
             style={[
@@ -141,20 +166,19 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
 
-        {/* X/Y défis complétés */}
         <Text style={styles.progressionTexte}>
           {defisCompletes}/{totalDefis} défis complétés
         </Text>
       </View>
 
-      {/* Seuls les défis scrollent */}
       <ScrollView
-        style={{ flex: 1, width: "100%" }}
+        style={{ flex: 1, width: "90%" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {tousLesDefis.map((defi) => {
           const pas = defi.pas ? defi.pas : 10;
+          const estFixe = defi.pas !== undefined;
 
           return (
             <DefiItem
@@ -166,14 +190,15 @@ export default function HomeScreen({ navigation }) {
               onDecrement={() =>
                 dispatch(modifierValeur({ id: defi.id, delta: -pas }))
               }
+              onModifierObjectif={
+                estFixe ? () => ouvrirModalObjectif(defi) : undefined
+              }
             />
           );
         })}
       </ScrollView>
 
-      {/* Boutons toujours visibles en bas — ils ne scrollent pas */}
       <View style={styles.sectionBas}>
-        {/* Bouton ajouter un défi */}
         <TouchableOpacity
           style={styles.boutonAjouter}
           onPress={() => setModalVisible(true)}
@@ -181,7 +206,6 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.boutonAjouterTexte}>Ajouter un défi</Text>
         </TouchableOpacity>
 
-        {/* Recette + Jeu côte à côte */}
         <View style={styles.boutonsBasRow}>
           <TouchableOpacity
             style={styles.boutonSecondaire}
@@ -199,7 +223,62 @@ export default function HomeScreen({ navigation }) {
         </View>
       </View>
 
-      {/* La modal — on lui passe tout ce dont elle a besoin */}
+      {/* Modal pour modifier l'objectif */}
+      <Modal visible={modalObjectifVisible} transparent animationType="slide">
+        <TouchableOpacity
+          style={styles.modalFond}
+          activeOpacity={1}
+          onPress={() => setModalObjectifVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalCarte}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.modalTitre}>Modifier l'objectif</Text>
+            {defiSelectionne && (
+              <Text style={styles.modalSousTitre}>{defiSelectionne.nom}</Text>
+            )}
+
+            <TextInput
+              style={styles.modalInput}
+              value={nouvelObjectif}
+              onChangeText={setNouvelObjectif}
+              keyboardType="numeric"
+              placeholder={
+                defiSelectionne?.id === "hydratation"
+                  ? "Nouvel objectif (ml)"
+                  : "Nouvel objectif"
+              }
+            />
+
+            {/* Affichage bonus UX Hydratation */}
+            {defiSelectionne?.id === "hydratation" && (
+              <Text style={styles.modalInfo}>
+                La valeur est en millilitres (ml) (
+                {parseInt(nouvelObjectif) / 1000} L)
+              </Text>
+            )}
+
+            <View style={styles.modalBoutons}>
+              <TouchableOpacity
+                style={[styles.modalBouton, styles.modalBoutonAnnuler]}
+                onPress={() => setModalObjectifVisible(false)}
+              >
+                <Text style={styles.modalBoutonTexteGris}>Annuler</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalBouton, styles.modalBoutonValider]}
+                onPress={validerObjectif}
+              >
+                <Text style={styles.modalBoutonTexte}>Valider</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
       <AjoutDefiModal
         visible={modalVisible}
         nom={nomNouveauDefi}
@@ -218,25 +297,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    paddingTop: 90,
-    paddingHorizontal: 10,
-  },
-
-  // Icône gear en haut à droite au dessus de la carte
-  boutonIconeHaut: {
-    alignSelf: "flex-end",
-    marginBottom: 8,
-    padding: 6,
+    // gap: 0,
+    // paddingHorizontal: 10,
   },
 
   // Carte profil fixe avec photo + barre globale
   carteProfile: {
-    width: "100%",
+    width: "90%",
     backgroundColor: "#dce8f5",
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     marginBottom: 16,
+    marginTop: 40,
   },
   photoProfile: {
     width: 80,
@@ -250,25 +323,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     overflow: "hidden",
   },
-  imageProfile: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  // Si pas de photo on affiche la première lettre du pseudo
-  initialeProfile: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#1a3a5c",
-  },
+  imageProfile: { width: 80, height: 80, borderRadius: 40 },
+  initialeProfile: { fontSize: 32, fontWeight: "bold", color: "#1a3a5c" },
   nomProfile: {
     fontSize: 16,
     fontWeight: "600",
     color: "#1a3a5c",
     marginBottom: 10,
   },
-
-  // Barre de progression globale
   progressionGlobaleFond: {
     width: "100%",
     height: 12,
@@ -282,21 +344,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#07905C",
     borderRadius: 6,
   },
-  progressionTexte: {
-    fontSize: 12,
-    color: "#1a3a5c",
-  },
-
-  // Boutons fixes en bas — jamais dans le scroll
+  progressionTexte: { fontSize: 12, color: "#1a3a5c" },
   sectionBas: {
-    width: "100%",
+    width: "90%",
     gap: 12,
     paddingBottom: 20,
     paddingTop: 12,
     backgroundColor: "#fff",
   },
-
-  // Bouton orange "Ajouter un défi"
   boutonAjouter: {
     backgroundColor: "#FFA85C",
     borderRadius: 30,
@@ -304,13 +359,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  boutonAjouterTexte: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-
-  // Recette + Jeu côte à côte
+  boutonAjouterTexte: { color: "#fff", fontWeight: "bold", fontSize: 15 },
   boutonsBasRow: {
     flexDirection: "row",
     gap: 12,
@@ -326,13 +375,61 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  boutonSecondaireGris: {
+  boutonSecondaireGris: { backgroundColor: "#fff", borderColor: "#ccc" },
+  boutonSecondaireTexte: { fontSize: 15, fontWeight: "600", color: "#333" },
+  modalFond: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalCarte: {
     backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    width: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalTitre: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  modalSousTitre: {
+    fontSize: 14,
+    color: "#888",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  modalInput: {
+    borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginBottom: 4,
+    textAlign: "center",
   },
-  boutonSecondaireTexte: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
+  modalInfo: {
+    textAlign: "center",
+    color: "#888",
+    fontSize: 12,
+    marginBottom: 10,
   },
+  modalBoutons: { flexDirection: "row", gap: 10 },
+  modalBouton: {
+    flex: 1,
+    borderRadius: 20,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  modalBoutonAnnuler: { backgroundColor: "#f0f0f0" },
+  modalBoutonValider: { backgroundColor: "#FFA85C" },
+  modalBoutonTexteGris: { color: "#888", fontWeight: "600" },
+  modalBoutonTexte: { color: "#fff", fontWeight: "bold" },
 });

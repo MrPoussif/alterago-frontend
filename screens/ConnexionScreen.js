@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import * as React from "react";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
+import Header from "../components/common/Header";
 
 export default function ConnexionScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -101,56 +102,66 @@ export default function ConnexionScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <Header
+        title="ALTERAGO"
+        navigation={navigation}
+        showSettings={false}
+        showVide={false}
+      />
       <Text style={styles.title}>Welcome to AlterAgo</Text>
       {/* BLOC DE CONNEXION */}
-      <TextInput
-        placeholder="Email"
-        onChangeText={(value) => setSignInEmail(value)}
-        value={signInEmail}
-        style={styles.input}
-        autoComplete={"email"}
-        inputMode={"email"}
-      />
-      <TextInput
-        placeholder="Password"
-        onChangeText={(value) => setSignInPassword(value)}
-        value={signInPassword}
-        style={styles.input}
-        autoComplete={"current-password"}
-        secureTextEntry={true}
-      />
-      <TouchableOpacity
-        onPress={() => onSignInPress()}
-        style={styles.button}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.textButton}>Sign In</Text>
-      </TouchableOpacity>
+      <View style={styles.connexion}>
+        <TextInput
+          placeholder="Email"
+          onChangeText={(value) => setSignInEmail(value)}
+          value={signInEmail}
+          style={styles.input}
+          autoComplete={"email"}
+          inputMode={"email"}
+        />
+        <TextInput
+          placeholder="Password"
+          onChangeText={(value) => setSignInPassword(value)}
+          value={signInPassword}
+          style={styles.input}
+          autoComplete={"current-password"}
+          secureTextEntry={true}
+        />
+        <TouchableOpacity
+          onPress={() => onSignInPress()}
+          style={styles.button}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.textButton}>Sign In</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.line}></View>
-      {/* BLOC DE CREATION DE COMPTE */}
-      <TextInput
-        placeholder="Email"
-        onChangeText={(value) => setSignUpEmail(value)}
-        value={signUpEmail}
-        style={styles.input}
-        autoComplete={"email"}
-        inputMode={"email"}
-      />
-      <TextInput
-        placeholder="Password"
-        onChangeText={(value) => setSignUpPassword(value)}
-        value={signUpPassword}
-        style={styles.input}
-        autoComplete={"new-password"}
-        secureTextEntry={true}
-      />
-      <TouchableOpacity
-        onPress={() => onSignUpPress()}
-        style={styles.button}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.textButton}>Sign Up</Text>
-      </TouchableOpacity>
+      <View style={styles.inscription}>
+        {/* BLOC DE CREATION DE COMPTE */}
+        <TextInput
+          placeholder="Email"
+          onChangeText={(value) => setSignUpEmail(value)}
+          value={signUpEmail}
+          style={styles.input}
+          autoComplete={"email"}
+          inputMode={"email"}
+        />
+        <TextInput
+          placeholder="Password"
+          onChangeText={(value) => setSignUpPassword(value)}
+          value={signUpPassword}
+          style={styles.input}
+          autoComplete={"new-password"}
+          secureTextEntry={true}
+        />
+        <TouchableOpacity
+          onPress={() => onSignUpPress()}
+          style={styles.button}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.textButton}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -160,17 +171,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    width: "100%",
-    height: "50%",
+    // justifyContent: "space-between",
   },
   title: {
     width: "80%",
     fontSize: 38,
     fontWeight: "600",
     color: "black",
+    textAlign: "center",
+    marginTop: 30,
+  },
+  connexion: {
+    width: "100%",
+    alignItems: "center",
+  },
+  inscription: {
+    width: "100%",
+    alignItems: "center",
   },
   input: {
     width: "80%",

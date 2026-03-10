@@ -15,8 +15,9 @@ import Slider from "@react-native-community/slider";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { FontAwesome6 } from "@expo/vector-icons";
+import Header from "../components/common/Header";
 
-export default function EventScreen() {
+export default function EventScreen({ navigation }) {
   const [currentPosition, setCurrentPosition] = useState(null); //état position actuelle
   const [fichesListVisible, setFichesListVisible] = useState(false); //état visibilité de la liste des adresses
   const [ficheDetail, setFicheDetail] = useState(null); //état visibilité de la fiche de l'adresse selectionnée
@@ -257,6 +258,7 @@ export default function EventScreen() {
 
   return (
     <View style={styles.container}>
+      <Header title="EVENEMENT" navigation={navigation} />
       <MapView
         initialRegion={{
           latitude: currentPosition.latitude,

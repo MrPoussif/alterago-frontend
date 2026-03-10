@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -15,6 +14,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import * as ImagePicker from "expo-image-picker";
+import Header from "../components/common/Header";
 
 //Avatars issus du dossier AlterAgo/avatars sur cloudinary
 const avatars = [
@@ -187,117 +187,117 @@ export default function CreationScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          with: "100%",
-          borderColor: "red",
-          borderWith: "2",
-        }}
-      >
-        <TouchableOpacity onPress={() => handlePreviousPress()}>
-          <FontAwesome
-            name={"arrow-left"}
-            size={30}
-            color={"#FFA85C"}
-          ></FontAwesome>
-        </TouchableOpacity>
+      <Header
+        title="CREATION DE PROFIL"
+        navigation={navigation}
+        showSettings={false}
+        showVide={false}
+      />
+      <View style={styles.profilePic}>
         <Image
           source={{
             uri: `${image}`,
+            // uri: `${avatars[avatarIndex]}`,
           }}
           style={{
             width: 150,
             height: 150,
             marginBottom: 5,
             borderRadius: 100,
-            marginHorizontal: 10,
           }}
         />
-        <TouchableOpacity onPress={() => handleNextPress()}>
-          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.iconsBox}>
-        <TouchableOpacity onPress={() => handleUploadPress()}>
-          <FontAwesome
-            name={"folder-open"}
-            size={25}
-            color={"#FFA85C"}
-          ></FontAwesome>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCameraPress()}>
-          <FontAwesome
-            name={"camera"}
-            size={25}
-            color={"#FFA85C"}
-          ></FontAwesome>
-        </TouchableOpacity>
-      </View>
-      <TextInput
-        placeholder="Pseudo"
-        onChangeText={(value) => setNickname(value)}
-        value={nickname}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Prénom"
-        onChangeText={(value) => setFirstname(value)}
-        value={firstname}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Nom"
-        onChangeText={(value) => setLastname(value)}
-        value={lastname}
-        style={styles.input}
-      />
-      <View style={styles.inputBisContainer}>
-        <View style={styles.pickerView}>
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            selectedValue={gender}
-            onValueChange={(value) => setGender(value)}
-          >
-            {genderArray.map((gender) => {
-              return (
-                <Picker.Item
-                  label={gender}
-                  value={gender}
-                  style={styles.pickerItem}
-                />
-              );
-            })}
-          </Picker>
-        </View>
-        <View style={styles.pickerView}>
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            numberOfLines={5}
-            selectedValue={age}
-            onValueChange={(value) => setAge(value)}
-          >
-            {agesArray.map((age) => {
-              return (
-                <Picker.Item
-                  label={age}
-                  value={age}
-                  style={styles.pickerItem}
-                />
-              );
-            })}
-          </Picker>
+        <View style={styles.arrowsBox}>
+          <TouchableOpacity onPress={() => handlePreviousPress()}>
+            <FontAwesome
+              name={"arrow-left"}
+              size={30}
+              color={"#FFA85C"}
+            ></FontAwesome>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleUploadPress()}>
+            <FontAwesome
+              name={"upload"}
+              size={25}
+              color={"#FFA85C"}
+            ></FontAwesome>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleCameraPress()}>
+            <FontAwesome
+              name={"camera"}
+              size={25}
+              color={"#FFA85C"}
+            ></FontAwesome>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNextPress()}>
+            <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+          </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={() => handleConfirmationPress()}
-        style={styles.button}
-      >
-        <Text style={styles.btnTxt}>Valider</Text>
-      </TouchableOpacity>
+      <View style={styles.informations}>
+        <TextInput
+          placeholder="Pseudo"
+          onChangeText={(value) => setNickname(value)}
+          value={nickname}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Prénom"
+          onChangeText={(value) => setFirstname(value)}
+          value={firstname}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Nom"
+          onChangeText={(value) => setLastname(value)}
+          value={lastname}
+          style={styles.input}
+        />
+        <View style={styles.inputBisContainer}>
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              selectedValue={gender}
+              onValueChange={(value) => setGender(value)}
+            >
+              {genderArray.map((gender) => {
+                return (
+                  <Picker.Item
+                    label={gender}
+                    value={gender}
+                    style={styles.pickerItem}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              numberOfLines={5}
+              selectedValue={age}
+              onValueChange={(value) => setAge(value)}
+            >
+              {agesArray.map((age) => {
+                return (
+                  <Picker.Item
+                    label={age}
+                    value={age}
+                    style={styles.pickerItem}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => handleConfirmationPress()}
+          style={styles.button}
+        >
+          <Text style={styles.btnTxt}>Valider</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -307,13 +307,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    // justifyContent: "center",
+  },
+  profilePic: {
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 30,
   },
   iconsBox: {
     width: "30%",
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 10,
+  },
+  informations: {
+    alignItems: "center",
+    width: "100%",
   },
   input: {
     width: "70%",
