@@ -222,7 +222,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Modal pour modifier l'objectif */}
-      <Modal visible={modalObjectifVisible} transparent animationType="slide">
+      <Modal visible={modalObjectifVisible} transparent animationType="none">
         <TouchableOpacity
           style={styles.modalFond}
           activeOpacity={1}
@@ -380,8 +380,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 36,
   },
   modalCarte: {
+    marginTop: -36,
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,

@@ -22,7 +22,7 @@ export default function AjoutDefiModal({
   onSupprimer,
 }) {
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="none">
       {/* Fond grisé qui ferme la modal si on clique dessus */}
       <TouchableOpacity
         style={styles.fond}
@@ -105,12 +105,15 @@ const styles = StyleSheet.create({
   // Le fond semi-transparent derrière la carte
   fond: {
     flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 36,
   },
 
   // La carte blanche
   contenu: {
+    marginTop: -36,
     backgroundColor: "#fff",
     padding: 24,
     borderRadius: 12,

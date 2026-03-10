@@ -39,7 +39,6 @@ export default function CreationScreen({ navigation }) {
   const user = useUser();
 
   useEffect(() => {
-    // console.log("use effect");
     console.log("user", user.user.id);
   }, []);
 
@@ -74,9 +73,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -101,9 +97,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -139,7 +132,6 @@ export default function CreationScreen({ navigation }) {
             type: "image/jpeg",
             name: `profile_${nickname}.jpg`,
           });
-
           formData.append("api_key", signatureData.apiKey);
           formData.append("timestamp", signatureData.timestamp);
           formData.append("signature", signatureData.signature);
@@ -179,9 +171,7 @@ export default function CreationScreen({ navigation }) {
             );
             const signupData = await signupRes.json();
             // console.log("data", signupData);
-
             signupData && alert(signupData.error);
-
             // redirige vers le dashboard
             navigation.navigate("TabNavigator");
           }
@@ -204,44 +194,46 @@ export default function CreationScreen({ navigation }) {
         showVide={false}
       />
       <View style={styles.profilePic}>
+        <TouchableOpacity onPress={() => handlePreviousPress()}>
+          <FontAwesome
+            name={"arrow-left"}
+            size={30}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
         <Image
           source={{
             uri: `${image}`,
-            // uri: `${avatars[avatarIndex]}`,
           }}
           style={{
             width: 150,
             height: 150,
             marginBottom: 5,
             borderRadius: 100,
+            borderWidth: 5,
+            borderColor: "#1B4965",
+            marginHorizontal: 15,
           }}
         />
-        <View style={styles.arrowsBox}>
-          <TouchableOpacity onPress={() => handlePreviousPress()}>
-            <FontAwesome
-              name={"arrow-left"}
-              size={30}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleUploadPress()}>
-            <FontAwesome
-              name={"upload"}
-              size={25}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleCameraPress()}>
-            <FontAwesome
-              name={"camera"}
-              size={25}
-              color={"#FFA85C"}
-            ></FontAwesome>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleNextPress()}>
-            <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => handleNextPress()}>
+          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.iconsBox}>
+        <TouchableOpacity onPress={() => handleUploadPress()}>
+          <FontAwesome
+            name={"folder-open"}
+            size={25}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleCameraPress()}>
+          <FontAwesome
+            name={"camera"}
+            size={25}
+            color={"#FFA85C"}
+          ></FontAwesome>
+        </TouchableOpacity>
       </View>
       <View style={styles.informations}>
         <TextInput
@@ -317,18 +309,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    // justifyContent: "center",
   },
   profilePic: {
     alignItems: "center",
+    justifyContent: "center",
     width: "100%",
-    marginVertical: 30,
-  },
-  arrowsBox: {
-    width: "60%",
+    marginTop: 30,
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+  },
+  iconsBox: {
+    width: "30%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
   },
   informations: {
     alignItems: "center",
@@ -377,12 +370,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "45%",
     height: 50,
+    justifyContent: "center",
+    padding: 0,
   },
   picker: {
-    // flex: 1,
-    width: "100%",
-    // width: 120,
-    // height: 100,
+    width: 120,
     fontSize: 20,
   },
   pickerItem: {

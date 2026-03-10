@@ -1,29 +1,32 @@
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import { useState } from "react";
+import { StyleSheet, View, TextInput, TouchableOpacity } from "react-native";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function PwdInput(props) {
+  const [iconName, setIconName] = useState("eye-slash");
+  const [hidden, setHidden] = useState(true);
+  const handleHidePress = () => {
+    iconName === "eye-slash" ? setIconName("eye") : setIconName("eye-slash");
+    hidden === true ? setHidden(false) : setHidden(true);
+  };
   return (
     <View style={styles.inputRow}>
       <TextInput
         style={styles.input}
-        placeholder="Nouveau mot de passe"
-        onChangeText={(value) => setNewPwd(value)}
-        value={newPwd}
-        autoComplete={"new-password"}
-        secureTextEntry={true}
+        placeholder={props.placeholder}
+        onChangeText={(value) => props.setPwd(value)}
+        value={props.value}
+        autoComplete={props.autoComplete}
+        secureTextEntry={hidden}
       ></TextInput>
-      <FontAwesome name={"eye-slash"} size={20} color={"#07905C"} />
+      <TouchableOpacity onPress={() => handleHidePress()}>
+        <FontAwesome name={iconName} size={20} color={"#07905C"} />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  textStyle: { color: "#000000", height: 24 },
-  header: {
-    height: "20%",
-    widht: "100%",
-    borderColor: "red",
-    borderWidth: 2,
-  },
   inputRow: {
     width: "80%",
     flexDirection: "row",
@@ -35,6 +38,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#07905C",
     borderBottomWidth: 1,
     fontSize: 15,
-    marginRight: 10,
+    marginRight: 30,
   },
 });

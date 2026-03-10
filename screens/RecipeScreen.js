@@ -288,7 +288,7 @@ export default function RecipeScreen({ navigation }) {
       {/* </View> */}
 
       {/* Modal pour choisir un régime alimentaire */}
-      <Modal visible={modalRegimeVisible} transparent animationType="slide">
+      <Modal visible={modalRegimeVisible} transparent animationType="none">
         {/* Fond grisé — ferme la modal si on clique dessus */}
         <TouchableOpacity
           style={styles.modalFond}
@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 36,
   },
 
   // Carte blanche de la modal
