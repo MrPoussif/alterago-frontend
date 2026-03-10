@@ -47,20 +47,15 @@ export default function HomeScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [nomNouveauDefi, setNomNouveauDefi] = useState("");
 
-  // const [nickname, setNickname] = useState("");
-  // const [firstname, setFirstname] = useState("");
-  // const [lastname, setLastname] = useState("");
-  // const [image, setImage] = useState("");
-
   const [modalObjectifVisible, setModalObjectifVisible] = useState(false);
   const [defiSelectionne, setDefiSelectionne] = useState(null);
   const [nouvelObjectif, setNouvelObjectif] = useState("");
 
   useEffect(() => {
-    if (!isLoaded) return null;
+    if (!isLoaded) return;
     if (!isSignedIn) {
       navigation.navigate("Connexion");
-      return null;
+      return;
     }
     // récupération des informations user depuis la DB
     (async () => {
