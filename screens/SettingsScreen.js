@@ -12,7 +12,8 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import PwdInput from "../components/pwdInput";
+import PwdInput from "../components/PwdInput";
+import Header from "../components/common/Header";
 
 export default function SettingsScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);
@@ -64,6 +65,7 @@ export default function SettingsScreen({ navigation }) {
   };
   return (
     <View style={styles.container}>
+      <Header title="PARAMETRES" navigation={navigation} showSettings={false} />
       <View style={styles.bloc}>
         <Image
           source={{ uri: utilisateur.picture }}
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 80,
+    paddingBottom: 80,
   },
   bloc: {
     width: "80%",

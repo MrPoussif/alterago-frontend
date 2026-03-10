@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-expo";
+import Header from "../components/common/Header";
 
 export default function RecipeScreen({ navigation }) {
   const { isSignedIn, getToken } = useAuth();
@@ -69,7 +70,8 @@ export default function RecipeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
+      <Header title="RECETTE" navigation={navigation} />
       <ScrollView contentContainerStyle={styles.container}>
         {recipe ? (
           <>
@@ -99,7 +101,7 @@ export default function RecipeScreen({ navigation }) {
           <Text>Aucune recette disponible</Text>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
