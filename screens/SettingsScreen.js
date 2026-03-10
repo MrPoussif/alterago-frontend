@@ -13,7 +13,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import PwdInput from "../components/PwdInput";
+<<<<<<< HEAD
 import Header from "../components/common/Header";
+=======
+>>>>>>> 4dba3629857f76326eb5fbfef055b11a5851b55d
 
 export default function SettingsScreen({ navigation }) {
   const utilisateur = useSelector((state) => state.user.value);

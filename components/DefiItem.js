@@ -8,32 +8,72 @@ export default function DefiItem({
   onIncrement,
   onDecrement,
   onDelete,
+  onModifierObjectif,
 }) {
+  // estFixe = le défi a un champ "pas" → c'est un défi fixe (eau ou pas)
+  const estFixe = defi.pas !== undefined;
+
   return (
-    <View style={styles.ligne}>
+    <TouchableOpacity
+      style={styles.ligne}
+      activeOpacity={estFixe ? 0.7 : 1}
+      onPress={estFixe && onModifierObjectif ? onModifierObjectif : undefined}
+    >
+      {/* Icône du défi dans un cercle */}
       <View style={styles.cercle}>
         <Text style={{ fontSize: 24 }}>{defi.icone ? defi.icone : "⬜"}</Text>
       </View>
 
+      {/* Nom + barre de progression (la barre affiche déjà la valeur) */}
       <View style={styles.contenu}>
         <Text style={styles.nom}>{defi.nom}</Text>
+
+        {/* BarreProgression affiche la valeur ET la barre — le max est toujours à jour */}
         <BarreProgression defi={defi} />
+
+        {/* Petit indice orange pour les défis fixes */}
+        {estFixe && (
+          <Text style={styles.indiceCliquable}>
+            Appuie pour modifier l'objectif
+          </Text>
+        )}
       </View>
 
-      <TouchableOpacity style={styles.bouton} onPress={onDecrement}>
+      {/* Bouton moins — on arrête la propagation pour ne pas déclencher onModifierObjectif */}
+      <TouchableOpacity
+        style={styles.bouton}
+        onPress={(e) => {
+          e.stopPropagation();
+          onDecrement();
+        }}
+      >
         <Text style={styles.texteBouton}>-</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.bouton} onPress={onIncrement}>
+      {/* Bouton plus — idem */}
+      <TouchableOpacity
+        style={styles.bouton}
+        onPress={(e) => {
+          e.stopPropagation();
+          onIncrement();
+        }}
+      >
         <Text style={styles.texteBouton}>+</Text>
       </TouchableOpacity>
 
+      {/* Bouton poubelle — seulement sur les défis personnalisés */}
       {estPersonnalise && (
-        <TouchableOpacity style={styles.supprimer} onPress={onDelete}>
+        <TouchableOpacity
+          style={styles.supprimer}
+          onPress={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        >
           <Text style={{ color: "#fff" }}>🗑️</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -58,10 +98,24 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
   },
+  nomLigne: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   nom: {
     fontSize: 16,
     fontWeight: "500",
-    marginBottom: 4,
+  },
+  valeur: {
+    fontSize: 12,
+    color: "#888",
+  },
+  indiceCliquable: {
+    fontSize: 10,
+    color: "#FFA85C",
+    marginTop: 3,
   },
   bouton: {
     width: 32,
@@ -75,7 +129,7 @@ const styles = StyleSheet.create({
   texteBouton: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#ffffffff",
+    color: "#fff",
   },
   supprimer: {
     marginLeft: 6,
