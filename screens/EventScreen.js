@@ -408,7 +408,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // ── Panel ──────────────────────────────────────────
   panel: {
     position: "absolute",
     left: 12,
@@ -430,7 +429,6 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
 
-  // ── Reset ──────────────────────────────────────────
   resetBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -443,7 +441,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
 
-  // ── Liste fiches ───────────────────────────────────
   fichesList: {
     maxHeight: 200,
   },
@@ -481,7 +478,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
 
-  // ── Fiche détail ───────────────────────────────────
   ficheContainer: {
     gap: 10,
   },
@@ -568,7 +564,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  // ── Picker ─────────────────────────────────────────
   pickerWrapper: {
     gap: 4,
   },
@@ -593,7 +588,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  // ── Footer ─────────────────────────────────────────
   panelFooter: {
     flexDirection: "row",
     alignItems: "center",

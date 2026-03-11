@@ -14,7 +14,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import {
   updateUserId,
-  updateEmail,
   updateFirstname,
   updateLastname,
   updateNickname,
@@ -24,8 +23,6 @@ import {
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
 import Header from "../components/common/Header";
-
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import {
   modifierValeur,
@@ -185,9 +182,7 @@ export default function HomeScreen({ navigation }) {
               onDecrement={() =>
                 dispatch(modifierValeur({ id: defi.id, delta: -pas }))
               }
-              onModifierObjectif={
-                estFixe ? () => ouvrirModalObjectif(defi) : undefined
-              }
+              onModifierObjectif={() => ouvrirModalObjectif(defi)}
             />
           );
         })}
@@ -277,7 +272,7 @@ export default function HomeScreen({ navigation }) {
       <AjoutDefiModal
         visible={modalVisible}
         nom={nomNouveauDefi}
-        setNom={setNomNouveauDefi}
+        setDefi={setNomNouveauDefi}
         onAjouter={handleAjouter}
         onFermer={() => setModalVisible(false)}
         defisPersonnalises={defisPersonnalises}

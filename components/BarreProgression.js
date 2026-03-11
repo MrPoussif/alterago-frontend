@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 export default function BarreProgression({ defi }) {
-  const { valeur, max } = defi;
+  const { valeur, max, unite } = defi;
 
   // Calcul du pourcentage de remplissage de la barre
   const pourcentage = (valeur / max) * 100;
@@ -22,7 +22,7 @@ export default function BarreProgression({ defi }) {
     }
 
     // Défis personnalisés — affichage simple
-    return `${valeur} / ${max}`;
+    return `${valeur} / ${max} ${unite}`;
   };
 
   return (
