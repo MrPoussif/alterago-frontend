@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Header from "../components/common/Header";
-import SignInModal from "../components/SignInModal";
+import SignInModal from "../components/SigninModal";
 import SignUpModal from "../components/SignUpModal";
 import { useUser } from "@clerk/clerk-expo";
 
