@@ -32,6 +32,8 @@ import {
 } from "../reducers/defis";
 
 export default function HomeScreen({ navigation }) {
+  console.log(" JE SUIS DANS LE HOME HELLO LA OU QUOI LA");
+
   const utilisateur = useSelector((state) => state.user.value);
   const defisFixes = useSelector((state) => state.defis.fixes);
   const defisPersonnalises = useSelector((state) => state.defis.personnalises);
@@ -60,7 +62,7 @@ export default function HomeScreen({ navigation }) {
       try {
         const token = await getToken();
         const userRes = await fetch(
-          `http://192.168.100.117:3000/users/${user.id}`,
+          `http://${process.env.MY_IP}:3000/users/${user.id}`,
           {
             method: "GET",
             headers: {

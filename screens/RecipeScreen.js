@@ -106,7 +106,7 @@ export default function RecipeScreen({ navigation }) {
       const token = await getToken();
 
       const reponse = await fetch(
-        "http://192.168.100.64:3000/recettes/random",
+        `http://${process.env.MY_IP}:3000/recettes/random`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -152,7 +152,7 @@ export default function RecipeScreen({ navigation }) {
 
       // On envoie le régime choisi dans l'URL
       const reponse = await fetch(
-        `http://192.168.100.64:3000/recettes/random/${regime.valeur}`,
+        `http://${process.env.MY_IP}:3000/recettes/random/${regime.valeur}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
