@@ -14,7 +14,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import {
   updateUserId,
-  updateEmail,
   updateFirstname,
   updateLastname,
   updateNickname,
@@ -24,8 +23,6 @@ import {
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
 import Header from "../components/common/Header";
-
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import {
   modifierValeur,
@@ -47,11 +44,6 @@ export default function HomeScreen({ navigation }) {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [nomNouveauDefi, setNomNouveauDefi] = useState("");
-
-  // const [nickname, setNickname] = useState("");
-  // const [firstname, setFirstname] = useState("");
-  // const [lastname, setLastname] = useState("");
-  // const [image, setImage] = useState("");
 
   const [modalObjectifVisible, setModalObjectifVisible] = useState(false);
   const [defiSelectionne, setDefiSelectionne] = useState(null);
