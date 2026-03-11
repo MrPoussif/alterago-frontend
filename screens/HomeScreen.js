@@ -60,7 +60,7 @@ export default function HomeScreen({ navigation }) {
       try {
         const token = await getToken();
         const userRes = await fetch(
-          `http://192.168.100.117:3000/users/${user.id}`,
+          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/${user.id}`,
           {
             method: "GET",
             headers: {
@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
             },
           },
         );
-        console.log("coucou2");
         const userData = await userRes.json();
         // Enregistrement utilisateur dans redux
         userData && console.log("userData", userData.user);

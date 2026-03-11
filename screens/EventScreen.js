@@ -42,7 +42,7 @@ export default function EventScreen({ navigation }) {
         const token = await getToken();
         //récupération des filtres pour Modal
         const rawQuery = await fetch(
-          "http://192.168.100.230:3000/events/categories",
+          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/categories`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -68,19 +68,22 @@ export default function EventScreen({ navigation }) {
   //lancer la recherche
   const handleClickSearch = async () => {
     const token = await getToken();
-    const response = await fetch("http://192.168.100.230:3000/events/nearby", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/nearby`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
+          category: selectedFilter,
+          radius: radius,
+        }),
       },
-      body: JSON.stringify({
-        latitude: currentPosition.latitude,
-        longitude: currentPosition.longitude,
-        category: selectedFilter,
-        radius: radius,
-      }),
-    });
+    );
     const data = await response.json();
     setPlaces(data);
     setFichesListVisible(true);

@@ -90,7 +90,7 @@ export default function RecipeScreen({ navigation }) {
       const token = await getToken();
 
       const reponse = await fetch(
-        "http://192.168.100.64:3000/recettes/random",
+        `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/recettes/random`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
