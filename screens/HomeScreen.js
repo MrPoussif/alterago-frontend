@@ -23,6 +23,7 @@ import {
 
 import DefiItem from "../components/DefiItem";
 import AjoutDefiModal from "../components/AjoutDefiModal";
+import Header from "../components/common/Header";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
@@ -129,13 +130,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.conteneur}>
-      <TouchableOpacity
-        style={styles.boutonIconeHaut}
-        onPress={() => navigation.navigate("Settings")}
-      >
-        <FontAwesome name="gear" size={30} color="#FFA85C" />
-      </TouchableOpacity>
-
+      <Header title="HOME" navigation={navigation} />
+      {/* Carte profil fixe — elle ne scroll pas avec les défis */}
       <View style={styles.carteProfile}>
         <View style={styles.photoProfile}>
           {utilisateur.picture ? (
@@ -171,7 +167,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <ScrollView
-        style={{ flex: 1, width: "100%" }}
+        style={{ flex: 1, width: "90%" }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 20 }}
       >
@@ -223,7 +219,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Modal pour modifier l'objectif */}
-      <Modal visible={modalObjectifVisible} transparent animationType="slide">
+      <Modal visible={modalObjectifVisible} transparent animationType="none">
         <TouchableOpacity
           style={styles.modalFond}
           activeOpacity={1}
@@ -296,17 +292,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    paddingTop: 90,
-    paddingHorizontal: 10,
+    // gap: 0,
+    // paddingHorizontal: 10,
   },
-  boutonIconeHaut: { alignSelf: "flex-end", marginBottom: 8, padding: 6 },
+
+  // Carte profil fixe avec photo + barre globale
   carteProfile: {
-    width: "100%",
+    width: "90%",
     backgroundColor: "#dce8f5",
     borderRadius: 16,
     padding: 16,
     alignItems: "center",
     marginBottom: 16,
+    marginTop: 40,
   },
   photoProfile: {
     width: 80,
@@ -343,7 +341,7 @@ const styles = StyleSheet.create({
   },
   progressionTexte: { fontSize: 12, color: "#1a3a5c" },
   sectionBas: {
-    width: "100%",
+    width: "90%",
     gap: 12,
     paddingBottom: 20,
     paddingTop: 12,
@@ -379,8 +377,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 36,
   },
   modalCarte: {
+    marginTop: -36,
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,

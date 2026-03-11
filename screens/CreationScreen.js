@@ -1,6 +1,5 @@
 import {
   Alert,
-  Button,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -15,6 +14,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import * as ImagePicker from "expo-image-picker";
+import Header from "../components/common/Header";
 
 //Avatars issus du dossier AlterAgo/avatars sur cloudinary
 const avatars = [
@@ -39,7 +39,6 @@ export default function CreationScreen({ navigation }) {
   const user = useUser();
 
   useEffect(() => {
-    // console.log("use effect");
     console.log("user", user.user.id);
   }, []);
 
@@ -74,9 +73,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -101,9 +97,6 @@ export default function CreationScreen({ navigation }) {
         aspect: [1, 1],
         quality: 0.4,
       });
-
-      // console.log(result);
-
       if (!result.canceled) {
         setImage(result.assets[0].uri);
       }
@@ -139,7 +132,6 @@ export default function CreationScreen({ navigation }) {
             type: "image/jpeg",
             name: `profile_${nickname}.jpg`,
           });
-
           formData.append("api_key", signatureData.apiKey);
           formData.append("timestamp", signatureData.timestamp);
           formData.append("signature", signatureData.signature);
@@ -179,9 +171,7 @@ export default function CreationScreen({ navigation }) {
             );
             const signupData = await signupRes.json();
             // console.log("data", signupData);
-
             signupData && alert(signupData.error);
-
             // redirige vers le dashboard
             navigation.navigate("TabNavigator");
           }
@@ -197,19 +187,13 @@ export default function CreationScreen({ navigation }) {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Image
-        source={{
-          uri: `${image}`,
-          // uri: `${avatars[avatarIndex]}`,
-        }}
-        style={{
-          width: 150,
-          height: 150,
-          marginBottom: 5,
-          borderRadius: 100,
-        }}
+      <Header
+        title="CREATION DE PROFIL"
+        navigation={navigation}
+        showSettings={false}
+        showVide={false}
       />
-      <View style={styles.arrowsBox}>
+      <View style={styles.profilePic}>
         <TouchableOpacity onPress={() => handlePreviousPress()}>
           <FontAwesome
             name={"arrow-left"}
@@ -217,9 +201,28 @@ export default function CreationScreen({ navigation }) {
             color={"#FFA85C"}
           ></FontAwesome>
         </TouchableOpacity>
+        <Image
+          source={{
+            uri: `${image}`,
+          }}
+          style={{
+            width: 150,
+            height: 150,
+            marginBottom: 5,
+            borderRadius: 100,
+            borderWidth: 5,
+            borderColor: "#1B4965",
+            marginHorizontal: 15,
+          }}
+        />
+        <TouchableOpacity onPress={() => handleNextPress()}>
+          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.iconsBox}>
         <TouchableOpacity onPress={() => handleUploadPress()}>
           <FontAwesome
-            name={"upload"}
+            name={"folder-open"}
             size={25}
             color={"#FFA85C"}
           ></FontAwesome>
@@ -231,73 +234,72 @@ export default function CreationScreen({ navigation }) {
             color={"#FFA85C"}
           ></FontAwesome>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleNextPress()}>
-          <FontAwesome name={"arrow-right"} size={30} color={"#FFA85C"} />
+      </View>
+      <View style={styles.informations}>
+        <TextInput
+          placeholder="Pseudo"
+          onChangeText={(value) => setNickname(value)}
+          value={nickname}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Prénom"
+          onChangeText={(value) => setFirstname(value)}
+          value={firstname}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Nom"
+          onChangeText={(value) => setLastname(value)}
+          value={lastname}
+          style={styles.input}
+        />
+        <View style={styles.inputBisContainer}>
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              selectedValue={gender}
+              onValueChange={(value) => setGender(value)}
+            >
+              {genderArray.map((gender) => {
+                return (
+                  <Picker.Item
+                    label={gender}
+                    value={gender}
+                    style={styles.pickerItem}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              numberOfLines={5}
+              selectedValue={age}
+              onValueChange={(value) => setAge(value)}
+            >
+              {agesArray.map((age) => {
+                return (
+                  <Picker.Item
+                    label={age}
+                    value={age}
+                    style={styles.pickerItem}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+        </View>
+        <TouchableOpacity
+          onPress={() => handleConfirmationPress()}
+          style={styles.button}
+        >
+          <Text style={styles.btnTxt}>Valider</Text>
         </TouchableOpacity>
       </View>
-      <TextInput
-        placeholder="Pseudo"
-        onChangeText={(value) => setNickname(value)}
-        value={nickname}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Prénom"
-        onChangeText={(value) => setFirstname(value)}
-        value={firstname}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Nom"
-        onChangeText={(value) => setLastname(value)}
-        value={lastname}
-        style={styles.input}
-      />
-      <View style={styles.inputBisContainer}>
-        <View style={styles.pickerView}>
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            selectedValue={gender}
-            onValueChange={(value) => setGender(value)}
-          >
-            {genderArray.map((gender) => {
-              return (
-                <Picker.Item
-                  label={gender}
-                  value={gender}
-                  style={styles.pickerItem}
-                />
-              );
-            })}
-          </Picker>
-        </View>
-        <View style={styles.pickerView}>
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            numberOfLines={5}
-            selectedValue={age}
-            onValueChange={(value) => setAge(value)}
-          >
-            {agesArray.map((age) => {
-              return (
-                <Picker.Item
-                  label={age}
-                  value={age}
-                  style={styles.pickerItem}
-                />
-              );
-            })}
-          </Picker>
-        </View>
-      </View>
-      <TouchableOpacity
-        onPress={() => handleConfirmationPress()}
-        style={styles.button}
-      >
-        <Text style={styles.btnTxt}>Valider</Text>
-      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
@@ -307,13 +309,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
   },
-  arrowsBox: {
-    width: "60%",
+  profilePic: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 30,
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+  },
+  iconsBox: {
+    width: "30%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  informations: {
+    alignItems: "center",
+    width: "100%",
   },
   input: {
     width: "70%",
@@ -358,12 +370,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "45%",
     height: 50,
+    justifyContent: "center",
+    padding: 0,
   },
   picker: {
-    // flex: 1,
-    width: "100%",
-    // width: 120,
-    // height: 100,
+    width: 120,
     fontSize: 20,
   },
   pickerItem: {

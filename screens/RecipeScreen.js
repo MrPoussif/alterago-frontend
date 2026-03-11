@@ -8,23 +8,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@clerk/clerk-expo";
+import Header from "../components/common/Header";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// Liste des régimes alimentaires disponibles
-// "label" = ce qu'on affiche à l'utilisateur
-// "valeur" = ce qu'on envoie à l'API Spoonacular
-const REGIMES = [
-  { label: "🌱 Vegan", valeur: "vegan" },
-  { label: "🥗 Végétarien", valeur: "vegetarian" },
-  { label: "🐟 Piscivore", valeur: "pescetarian" },
-  { label: "🌾 Sans gluten", valeur: "gluten free" },
-  { label: "🥩 Viande / Paléo", valeur: "primal" },
-  { label: "🍮 Dessert", valeur: "dessert" },
-];
 
 export default function RecipeScreen({ navigation }) {
   const { isSignedIn, getToken } = useAuth();
@@ -37,9 +25,6 @@ export default function RecipeScreen({ navigation }) {
 
   // Est-ce que la recette est dans les favoris ?
   const [enFavori, setEnFavori] = useState(false);
-
-  // Est-ce que la modal de choix de régime est ouverte ?
-  const [modalRegimeVisible, setModalRegimeVisible] = useState(false);
 
   // Retourne la date du jour sous forme "2024-03-09"
   const getDateDuJour = () => {
@@ -134,52 +119,6 @@ export default function RecipeScreen({ navigation }) {
     }
   };
 
-  // Va chercher une recette selon un régime alimentaire choisi
-  // Cette fonction utilise la 2ème route du backend : /random/:diet
-  const fetchRecetteParRegime = async (regime) => {
-    if (!isSignedIn) {
-      Alert.alert("Non connecté", "Connecte-toi pour voir les recettes.");
-      return;
-    }
-
-    // On ferme la modal avant de lancer le chargement
-    setModalRegimeVisible(false);
-
-    try {
-      setLoading(true);
-      const token = await getToken();
-
-      // On envoie le régime choisi dans l'URL
-      const reponse = await fetch(
-        `http://192.168.100.64:3000/recettes/random/${regime.valeur}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      const data = await reponse.json();
-      const nouvelleRecette = data.recette;
-
-      // On sauvegarde cette recette comme recette du jour
-      await AsyncStorage.setItem(
-        "recette_data",
-        JSON.stringify(nouvelleRecette),
-      );
-      await AsyncStorage.setItem("recette_date", getDateDuJour());
-
-      setRecette(nouvelleRecette);
-      verifierSiEnFavori(nouvelleRecette);
-    } catch (err) {
-      console.error("Erreur fetchRecetteParRegime :", err);
-      Alert.alert("Erreur", "Impossible de récupérer la recette");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Au chargement de l'écran, on regarde si on a déjà une recette du jour
   useEffect(() => {
     const chargerRecetteDuJour = async () => {
@@ -226,8 +165,9 @@ export default function RecipeScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.conteneur}>
+    <View style={styles.safeArea}>
+      <Header title="RECETTE" navigation={navigation} />
+      <ScrollView contentContainerStyle={styles.container}>
         {recette ? (
           <>
             {/* Titre + bouton cœur */}
@@ -262,14 +202,6 @@ export default function RecipeScreen({ navigation }) {
                 <Text style={styles.boutonTexte}>🔀 Nouvelle recette</Text>
               </TouchableOpacity>
 
-              {/* Bouton choisir un régime — ouvre la modal */}
-              <TouchableOpacity
-                style={[styles.bouton, styles.boutonRegime]}
-                onPress={() => setModalRegimeVisible(true)}
-              >
-                <Text style={styles.boutonTexte}>🥗 Par régime</Text>
-              </TouchableOpacity>
-
               {/* Bouton voir les favoris */}
               <TouchableOpacity
                 style={[styles.bouton, styles.boutonFavoris]}
@@ -283,44 +215,7 @@ export default function RecipeScreen({ navigation }) {
           <Text>Aucune recette disponible</Text>
         )}
       </ScrollView>
-
-      {/* Modal pour choisir un régime alimentaire */}
-      <Modal visible={modalRegimeVisible} transparent animationType="slide">
-        {/* Fond grisé — ferme la modal si on clique dessus */}
-        <TouchableOpacity
-          style={styles.modalFond}
-          activeOpacity={1}
-          onPress={() => setModalRegimeVisible(false)}
-        >
-          {/* Carte blanche */}
-          <TouchableOpacity
-            style={styles.modalCarte}
-            activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-          >
-            {/* Titre + croix */}
-            <View style={styles.modalEntete}>
-              <Text style={styles.modalTitre}>Choisir un régime</Text>
-              <TouchableOpacity onPress={() => setModalRegimeVisible(false)}>
-                <Text style={styles.modalCroix}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Liste des régimes — un bouton par régime */}
-            {REGIMES.map((regime) => (
-              <TouchableOpacity
-                key={regime.valeur}
-                style={styles.ligneRegime}
-                onPress={() => fetchRecetteParRegime(regime)}
-              >
-                <Text style={styles.ligneRegimeTexte}>{regime.label}</Text>
-                <Text style={styles.ligneRegimefleche}>→</Text>
-              </TouchableOpacity>
-            ))}
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -376,7 +271,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Les trois boutons en bas
+  // Les boutons en bas
   boutonsWrapper: {
     width: "100%",
     marginTop: 20,
@@ -388,9 +283,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
   },
-  boutonRegime: {
-    backgroundColor: "#07905C",
-  },
   boutonFavoris: {
     backgroundColor: "#ec6e5b",
   },
@@ -398,60 +290,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 15,
-  },
-
-  // Fond semi-transparent de la modal
-  modalFond: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  // Carte blanche de la modal
-  modalCarte: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
-    width: "85%",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-
-  // En-tête de la modal : titre + croix
-  modalEntete: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  modalTitre: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  modalCroix: {
-    fontSize: 18,
-    color: "#999",
-  },
-
-  // Chaque ligne de régime dans la modal
-  ligneRegime: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  ligneRegimeTexte: {
-    fontSize: 16,
-    color: "#333",
-  },
-  ligneRegimefleche: {
-    fontSize: 16,
-    color: "#FFA85C",
   },
 });

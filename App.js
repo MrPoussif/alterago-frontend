@@ -98,7 +98,7 @@ export default function App() {
         <SafeAreaView style={styles.container}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Connexion" component={TabNavigator} />
+              <Stack.Screen name="Connexion" component={ConnexionScreen} />
               <Stack.Screen name="Creation" component={CreationScreen} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Game" component={GameScreen} />

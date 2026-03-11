@@ -1,21 +1,83 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+// screens/SocialScreen.js
 
-export default function SocialScreen({ navigation }) {
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+
+// Faux utilisateurs codés en dur — juste pour voir comment ça rend
+const UTILISATEURS_FICTIFS = [
+  { id: "1", nickname: "Lucas", emoji: "🧑", ajoute: false },
+  { id: "2", nickname: "Sarah", emoji: "👩", ajoute: false },
+  { id: "3", nickname: "Tom", emoji: "🧔", ajoute: false },
+  { id: "4", nickname: "Léa", emoji: "👧", ajoute: false },
+];
+
+export default function SocialScreen() {
+  // On garde en mémoire quels utilisateurs ont été ajoutés
+  const [utilisateurs] = useState(UTILISATEURS_FICTIFS);
+
   return (
-    <View style={styles.container}>
-      {" "}
-      <Text>Social Screen</Text>{" "}
-      {/* <Button title="Go to Profile" // onPress={() => navigation.navigate("Profile")} /> */}{" "}
+    <View style={styles.conteneur}>
+      <Text style={styles.titre}>Social</Text>
+      <Text style={styles.sousTitre}>Amis</Text>
+
+      <ScrollView style={{ width: "100%" }}>
+        {utilisateurs.map((utilisateur) => (
+          <View key={utilisateur.id} style={styles.carte}>
+            {/* Avatar avec l'emoji */}
+            <View style={styles.avatar}>
+              <Text style={styles.avatarEmoji}>{utilisateur.emoji}</Text>
+            </View>
+
+            {/* Nom de l'utilisateur */}
+            <Text style={styles.nom}>{utilisateur.nickname}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  conteneur: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    paddingTop: 60,
+    paddingHorizontal: 16,
+  },
+  titre: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  sousTitre: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 20,
+  },
+  carte: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f8f8",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#dce8f5",
+    alignItems: "center",
     justifyContent: "center",
+    marginRight: 12,
+  },
+  avatarEmoji: {
+    fontSize: 24,
+  },
+  nom: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
