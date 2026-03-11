@@ -1,90 +1,122 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
-  Button,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
 import Header from "../components/common/Header";
-import SignInModal from "../components/SignInModal";
-import SignUpModal from "../components/SignUpModal";
-import { useUser } from "@clerk/clerk-expo";
 
 export default function ConnexionScreen({ navigation }) {
-  const [signInVisible, setSignInVisible] = useState(false);
-  const [signUpVisible, setSignUpVisible] = useState(false);
+  const dispatch = useDispatch();
 
   // *** Check if user is already SignedIn
-  // const { isSignedIn } = useUser();
-  // useEffect(() => {
-  //   if (isSignedIn) {
-  //     navigation.replace("TabNavigator");
-  //   }
-  // }, [isSignedIn]);
-  const sheetRef1 = useRef(null);
-  const sheetRef2 = useRef(null);
-
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const { isSignedIn } = useUser();
+  useEffect(() => {
+    if (isSignedIn) {
+      navigation.replace("TabNavigator");
+    }
+  }, [isSignedIn]);
 
   return (
-    <View style={styles.container}>
-      <Button
-        title="Ouvrir Bottom Sheet 1"
-        onPress={() => sheetRef1.current?.expand()}
+    <>
+      <Header
+        title="ALTERAGO"
+        navigation={navigation}
+        showSettings={false}
+        showVide={false}
       />
-      <Button
-        title="Ouvrir Bottom Sheet 2"
-        onPress={() => sheetRef2.current?.expand()}
-      />
-
-      {/* Bottom Sheet 1 */}
-      <BottomSheet
-        ref={sheetRef1}
-        index={-1} // -1 = fermé au départ
-        snapPoints={snapPoints}
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.content}>
-          <Text>Contenu du Bottom Sheet 1</Text>
-          <Button title="Fermer" onPress={() => sheetRef1.current?.close()} />
-        </View>
-      </BottomSheet>
+        <Text style={styles.title}>Welcome to AlterAgo</Text>
 
-      {/* Bottom Sheet 2 */}
-      {/* <BottomSheet ref={sheetRef2} index={-1} snapPoints={snapPoints}>
-        <View style={styles.content}>
-          <Text>Contenu du Bottom Sheet 2</Text>
-          <Button title="Fermer" onPress={() => sheetRef2.current?.close()} />
-        </View>
-      </BottomSheet> */}
-    </View>
+        <TouchableOpacity
+          style={styles.mainButton}
+          onPress={() => setSignInVisible(true)}
+        >
+          <Text style={styles.textButton}>Sign In</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.mainButton}
+          onPress={() => setSignUpVisible(true)}
+        >
+          <Text style={styles.textButton}>Sign Up</Text>
+        </TouchableOpacity>
+
+        {/* Sign In Modal */}
+        <SignInModal
+          visible={signInVisible}
+          onClose={() => setSignInVisible(false)}
+          onSuccess={() => navigation.replace("TabNavigator")}
+        />
+
+        {/* Sign Up Modal */}
+        <SignUpModal
+          visible={signUpVisible}
+          onClose={() => setSignUpVisible(false)}
+          onSuccess={() => navigation.replace("Creation")}
+        />
+      </KeyboardAvoidingView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
     alignItems: "center",
-    paddingTop: 70,
+    // justifyContent: "space-between",
   },
   title: {
+    width: "80%",
     fontSize: 38,
     fontWeight: "600",
     color: "black",
     textAlign: "center",
-    marginBottom: 40,
+    marginTop: 30,
   },
-  mainButton: {
-    width: "60%",
-    padding: 15,
-    backgroundColor: "#FFA85C",
-    borderRadius: 12,
+  connexion: {
+    width: "100%",
     alignItems: "center",
-    marginTop: 20,
   },
-  textButton: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  inscription: {
+    width: "100%",
+    alignItems: "center",
+  },
+  input: {
+    width: "80%",
+    marginTop: 25,
+    borderBottomColor: "#FFA85C",
+    borderBottomWidth: 1,
+    fontSize: 18,
+  },
+  button: {
+    alignItems: "center",
+    paddingTop: 8,
+    width: "80%",
+    marginTop: 30,
+    backgroundColor: "#FFA85C",
+    borderRadius: 10,
+    marginBottom: 80,
+  },
+  textButton: {
+    color: "#ffffff",
+    height: 30,
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  line: {
+    borderTopWidth: 2,
+    borderTopColor: "#07905C",
+    width: "70%",
+  },
 });
