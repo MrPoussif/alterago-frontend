@@ -8,11 +8,14 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+
+const defisArray = ["Écriture", "Lecture", "Musique"];
 
 export default function AjoutDefiModal({
   visible,
-  nom,
-  setNom,
+  defi,
+  setDefi,
   onAjouter,
   onFermer,
   defisPersonnalises,
@@ -62,12 +65,31 @@ export default function AjoutDefiModal({
           )}
 
           {/* Champ pour taper le nom du nouveau défi */}
-          <TextInput
+          <View style={styles.pickerView}>
+            <Picker
+              style={styles.picker}
+              mode="dropdown"
+              selectedValue={defi}
+              onValueChange={(value) => setDefi(value)}
+            >
+              {defisArray.map((defi) => {
+                return (
+                  <Picker.Item
+                    placeholder="Nom du nouveau défi"
+                    label={defi}
+                    value={defi}
+                    style={styles.pickerItem}
+                  />
+                );
+              })}
+            </Picker>
+          </View>
+          {/* <TextInput
             placeholder="Nom du nouveau défi"
-            value={nom}
+            value={defi}
             onChangeText={setNom}
             style={styles.input}
-          />
+          /> */}
 
           {/* Bouton valider */}
           <TouchableOpacity style={styles.bouton} onPress={onAjouter}>

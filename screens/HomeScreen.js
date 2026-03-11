@@ -182,9 +182,7 @@ export default function HomeScreen({ navigation }) {
               onDecrement={() =>
                 dispatch(modifierValeur({ id: defi.id, delta: -pas }))
               }
-              onModifierObjectif={
-                estFixe ? () => ouvrirModalObjectif(defi) : undefined
-              }
+              onModifierObjectif={() => ouvrirModalObjectif(defi)}
             />
           );
         })}
@@ -274,7 +272,7 @@ export default function HomeScreen({ navigation }) {
       <AjoutDefiModal
         visible={modalVisible}
         nom={nomNouveauDefi}
-        setNom={setNomNouveauDefi}
+        setDefi={setNomNouveauDefi}
         onAjouter={handleAjouter}
         onFermer={() => setModalVisible(false)}
         defisPersonnalises={defisPersonnalises}
