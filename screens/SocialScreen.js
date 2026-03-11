@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-
-// Faux utilisateurs codés en dur — juste pour voir comment ça rend
-const UTILISATEURS_FICTIFS = [
-  { id: "1", nickname: "Lucas", emoji: "🧑", ajoute: false },
-  { id: "2", nickname: "Sarah", emoji: "👩", ajoute: false },
-  { id: "3", nickname: "Tom", emoji: "🧔", ajoute: false },
-  { id: "4", nickname: "Léa", emoji: "👧", ajoute: false },
-];
+import { UTILISATEURS_FICTIFS } from "../constants/utilisateursfictifs";
 
 export default function SocialScreen() {
   // On garde en mémoire quels utilisateurs ont été ajoutés
