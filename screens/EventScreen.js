@@ -42,7 +42,7 @@ export default function EventScreen({ navigation }) {
         const token = await getToken();
         //récupération des filtres pour Modal
         const rawQuery = await fetch(
-          `http://${process.env.MY_IP}:3000/events/categories`,
+          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/categories`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -53,7 +53,6 @@ export default function EventScreen({ navigation }) {
         );
         const data = await rawQuery.json();
         setFilters(data);
-        console.log(process.env.MY_IP);
       }
     })();
   }, []);
@@ -70,7 +69,7 @@ export default function EventScreen({ navigation }) {
   const handleClickSearch = async () => {
     const token = await getToken();
     const response = await fetch(
-      `http://${process.env.MY_IP}:3000/events/nearby`,
+      `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/nearby`,
       {
         method: "POST",
         headers: {

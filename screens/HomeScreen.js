@@ -32,8 +32,6 @@ import {
 } from "../reducers/defis";
 
 export default function HomeScreen({ navigation }) {
-  console.log(" JE SUIS DANS LE HOME HELLO LA OU QUOI LA");
-
   const utilisateur = useSelector((state) => state.user.value);
   const defisFixes = useSelector((state) => state.defis.fixes);
   const defisPersonnalises = useSelector((state) => state.defis.personnalises);
@@ -52,17 +50,17 @@ export default function HomeScreen({ navigation }) {
   const [nouvelObjectif, setNouvelObjectif] = useState("");
 
   useEffect(() => {
-    if (!isLoaded) return null;
+    if (!isLoaded) return;
     if (!isSignedIn) {
       navigation.navigate("Connexion");
-      return null;
+      return;
     }
     // récupération des informations user depuis la DB
     (async () => {
       try {
         const token = await getToken();
         const userRes = await fetch(
-          `http://${process.env.MY_IP}:3000/users/${user.id}`,
+          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/${user.id}`,
           {
             method: "GET",
             headers: {
@@ -72,7 +70,6 @@ export default function HomeScreen({ navigation }) {
             },
           },
         );
-        console.log("coucou2");
         const userData = await userRes.json();
         // Enregistrement utilisateur dans redux
         userData && console.log("userData", userData.user);

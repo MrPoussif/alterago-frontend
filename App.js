@@ -15,8 +15,8 @@ import HomeScreen from "./screens/HomeScreen";
 import GameScreen from "./screens/GameScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import RecipeScreen from "./screens/RecipeScreen";
-import FavoriteScreen from "./screens/FavoriteScreen"; // 🆕
-import FavoriteDetailScreen from "./screens/FavoriteDetailScreen"; // 🆕
+import FavoriteScreen from "./screens/FavoriteScreen";
+import FavoriteDetailScreen from "./screens/FavoriteDetailScreen";
 
 // Redux
 import { Provider } from "react-redux";
@@ -63,8 +63,6 @@ const TabNavigator = () => {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Social" component={SocialScreen} />
 
-      {/* Ces écrans sont dans le Tab pour garder la barre de navigation en bas */}
-      {/* tabBarButton: () => null les cache des onglets mais ils restent accessibles */}
       <Tab.Screen
         name="Recipe"
         component={RecipeScreen}
@@ -80,7 +78,6 @@ const TabNavigator = () => {
         component={SettingsScreen}
         options={{ tabBarButton: () => null }}
       />
-      {/* FavoriteScreen dans le Tab pour garder la barre de navigation */}
       <Tab.Screen
         name="Favorite"
         component={FavoriteScreen}
@@ -101,15 +98,11 @@ export default function App() {
         <SafeAreaView style={styles.container}>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              {/* Utilisateur NON connecté */}
               <Stack.Screen name="Connexion" component={ConnexionScreen} />
               <Stack.Screen name="Creation" component={CreationScreen} />
-
-              {/* Utilisateur connecté */}
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen name="Game" component={GameScreen} />
               <Stack.Screen name="Settings" component={SettingsScreen} />
-              {/* Détail d'une recette favorite — dans le Stack pour pas avoir la tab bar */}
               <Stack.Screen
                 name="FavoriteDetail"
                 component={FavoriteDetailScreen}
