@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import * as React from "react";
 import {
   View,
   Text,
@@ -6,67 +7,58 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import Header from "../components/common/Header";
-import SignInModal from "../components/SigninModal";
-import SignUpModal from "../components/SignUpModal";
-import { useUser } from "@clerk/clerk-expo";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 export default function ConnexionScreen({ navigation }) {
   const [signInVisible, setSignInVisible] = useState(false);
   const [signUpVisible, setSignUpVisible] = useState(false);
 
   // *** Check if user is already SignedIn
-  const { isSignedIn } = useUser();
-  useEffect(() => {
-    if (isSignedIn) {
-      navigation.replace("TabNavigator");
-    }
-  }, [isSignedIn]);
+  // const { isSignedIn } = useUser();
+  // useEffect(() => {
+  //   if (isSignedIn) {
+  //     navigation.replace("TabNavigator");
+  //   }
+  // }, [isSignedIn]);
+  const sheetRef1 = useRef(null);
+  const sheetRef2 = useRef(null);
+
+  const snapPoints = useMemo(() => ["25%", "50%"], []);
 
   return (
-    <>
-      <Header
-        title="ALTERAGO"
-        navigation={navigation}
-        showSettings={false}
-        showVide={false}
+    <View style={styles.container}>
+      <Button
+        title="Ouvrir Bottom Sheet 1"
+        onPress={() => sheetRef1.current?.expand()}
       />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <Button
+        title="Ouvrir Bottom Sheet 2"
+        onPress={() => sheetRef2.current?.expand()}
+      />
+
+      {/* Bottom Sheet 1 */}
+      <BottomSheet
+        ref={sheetRef1}
+        index={-1} // -1 = fermé au départ
+        snapPoints={snapPoints}
       >
-        <Text style={styles.title}>Welcome to AlterAgo</Text>
+        <View style={styles.content}>
+          <Text>Contenu du Bottom Sheet 1</Text>
+          <Button title="Fermer" onPress={() => sheetRef1.current?.close()} />
+        </View>
+      </BottomSheet>
 
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={() => setSignInVisible(true)}
-        >
-          <Text style={styles.textButton}>Sign In</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.mainButton}
-          onPress={() => setSignUpVisible(true)}
-        >
-          <Text style={styles.textButton}>Sign Up</Text>
-        </TouchableOpacity>
-
-        {/* Sign In Modal */}
-        <SignInModal
-          visible={signInVisible}
-          onClose={() => setSignInVisible(false)}
-          onSuccess={() => navigation.replace("TabNavigator")}
-        />
-
-        {/* Sign Up Modal */}
-        <SignUpModal
-          visible={signUpVisible}
-          onClose={() => setSignUpVisible(false)}
-          onSuccess={() => navigation.replace("Creation")}
-        />
-      </KeyboardAvoidingView>
-    </>
+      {/* Bottom Sheet 2 */}
+      {/* <BottomSheet ref={sheetRef2} index={-1} snapPoints={snapPoints}>
+        <View style={styles.content}>
+          <Text>Contenu du Bottom Sheet 2</Text>
+          <Button title="Fermer" onPress={() => sheetRef2.current?.close()} />
+        </View>
+      </BottomSheet> */}
+    </View>
   );
 }
 
