@@ -11,9 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
 import Header from "../components/common/Header";
-import SignInModal from "../components/SignInModal";
-import SignUpModal from "../components/SignUpModal";
-import { useUser } from "@clerk/clerk-expo";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 export default function ConnexionScreen({ navigation }) {
   const dispatch = useDispatch();
