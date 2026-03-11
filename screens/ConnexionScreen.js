@@ -10,7 +10,9 @@ import {
   Button,
 } from "react-native";
 import Header from "../components/common/Header";
-import BottomSheet from "@gorhom/bottom-sheet";
+import SignInModal from "../components/SignInModal";
+import SignUpModal from "../components/SignUpModal";
+import { useUser } from "@clerk/clerk-expo";
 
 export default function ConnexionScreen({ navigation }) {
   const [signInVisible, setSignInVisible] = useState(false);
