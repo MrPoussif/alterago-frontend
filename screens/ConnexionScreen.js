@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
-  Text,
-  TextInput,
   TouchableOpacity,
 } from "react-native";
-import { useDispatch } from "react-redux";
-import { useUser, useSignUp, useSignIn } from "@clerk/clerk-expo";
 import Header from "../components/common/Header";
-import BottomSheet from "@gorhom/bottom-sheet";
+import SignInModal from "../components/SignInModal";
+import SignUpModal from "../components/SignUpModal";
+import { useUser } from "@clerk/clerk-expo";
 
 export default function ConnexionScreen({ navigation }) {
-  const dispatch = useDispatch();
+  const [signInVisible, setSignInVisible] = useState(false);
+  const [signUpVisible, setSignUpVisible] = useState(false);
 
   // *** Check if user is already SignedIn
   const { isSignedIn } = useUser();
@@ -73,51 +73,24 @@ export default function ConnexionScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     alignItems: "center",
-    // justifyContent: "space-between",
+    paddingTop: 70,
   },
   title: {
-    width: "80%",
     fontSize: 38,
     fontWeight: "600",
     color: "black",
     textAlign: "center",
-    marginTop: 30,
+    marginBottom: 40,
   },
-  connexion: {
-    width: "100%",
-    alignItems: "center",
-  },
-  inscription: {
-    width: "100%",
-    alignItems: "center",
-  },
-  input: {
-    width: "80%",
-    marginTop: 25,
-    borderBottomColor: "#FFA85C",
-    borderBottomWidth: 1,
-    fontSize: 18,
-  },
-  button: {
-    alignItems: "center",
-    paddingTop: 8,
-    width: "80%",
-    marginTop: 30,
+  mainButton: {
+    width: "60%",
+    padding: 15,
     backgroundColor: "#FFA85C",
-    borderRadius: 10,
-    marginBottom: 80,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 20,
   },
-  textButton: {
-    color: "#ffffff",
-    height: 30,
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  line: {
-    borderTopWidth: 2,
-    borderTopColor: "#07905C",
-    width: "70%",
-  },
+  textButton: { color: "#fff", fontWeight: "600", fontSize: 16 },
 });

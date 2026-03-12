@@ -5,7 +5,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 // Screens
 import ConnexionScreen from "./screens/ConnexionScreen";
@@ -97,21 +96,19 @@ export default function App() {
     >
       <Provider store={store}>
         <SafeAreaView style={styles.container}>
-          <GestureHandlerRootView>
-            <NavigationContainer>
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Connexion" component={ConnexionScreen} />
-                <Stack.Screen name="Creation" component={CreationScreen} />
-                <Stack.Screen name="TabNavigator" component={TabNavigator} />
-                <Stack.Screen name="Game" component={GameScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-                <Stack.Screen
-                  name="FavoriteDetail"
-                  component={FavoriteDetailScreen}
-                />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </GestureHandlerRootView>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Connexion" component={ConnexionScreen} />
+              <Stack.Screen name="Creation" component={CreationScreen} />
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen name="Game" component={GameScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen
+                name="FavoriteDetail"
+                component={FavoriteDetailScreen}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
         </SafeAreaView>
       </Provider>
     </ClerkProvider>
