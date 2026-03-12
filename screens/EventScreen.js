@@ -9,59 +9,46 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import * as Location from "expo-location";
 import { Picker } from "@react-native-picker/picker";
 import Slider from "@react-native-community/slider";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Header from "../components/common/Header";
+import FicheDetail from "../components/eventFicheDetaillee";
+import InviteModal from "../components/eventInviteModal";
+import useLocation from "../hooks/useLocation";
+import useCategories from "../hooks/useCategories";
+import { UTILISATEURS_FICTIFS } from "../constants/utilisateursfictifs";
 
 export default function EventScreen({ navigation }) {
-  const [currentPosition, setCurrentPosition] = useState(null); //état position actuelle
   const [fichesListVisible, setFichesListVisible] = useState(false); //état visibilité de la liste des adresses
   const [ficheDetail, setFicheDetail] = useState(null); //état visibilité de la fiche de l'adresse selectionnée
-  const [filters, setFilters] = useState([]); //état des filtres récupérés depuis backend
   const [selectedFilter, setSelectedFilter] = useState("manger"); //état du filtre sélectionné dans la Modal
   const [places, setPlaces] = useState([]); // état récupération des places via fetch google places lors de la recherche
   const [radius, setRadius] = useState(100); //état du rayon de recherche
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false); // état réduction de la fenêtre de recherche
   const [ShowTheRoad, setShowTheRoad] = useState(false); // état d'affichage de l'itinéraire
   const [distance, setDistance] = useState(null); // état de la distance de l'adresse sélectionnée
   const [duration, setDuration] = useState(null); // état de la durée estimée pour aller à l'adresse sélectionnée
-  const { getToken } = useAuth();
+  const [inviteModal, setInviteModal] = useState(false); // modal d'invitation
+  const [selectedFriends, setSelectedFriends] = useState([]); // amis selectionnés à inviter
+  const [inviteMess, setInviteMessModal] = useState(false); // modal message invitation envoyée
+  const [utilisateurs] = useState(UTILISATEURS_FICTIFS); // list d'amis
 
-  //position actuelle
-  useEffect(() => {
-    (async () => {
-      const result = await Location.requestForegroundPermissionsAsync();
-      const status = result?.status;
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync({});
-        location && setCurrentPosition(location.coords);
-        const token = await getToken();
-        //récupération des filtres pour Modal
-        const rawQuery = await fetch(
-          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/categories`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              //Envoi le token dans le header pour vérification par middleware dans le backend
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        const data = await rawQuery.json();
-        setFilters(data);
-      }
-    })();
-  }, []);
+  const { currentPosition, locationError } = useLocation(); // hook position actuelle
+  const { filters, filtersError } = useCategories(); // hook catégories
+  const { getToken } = useAuth(); // hook authorisation Clerk
 
   //chargement avant re-render composant sinon currentLocation null
   if (!currentPosition)
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#FFA85C" />
+        {locationError ? (
+          <Text>{locationError}</Text>
+        ) : (
+          <ActivityIndicator size="large" color="#FFA85C" />
+        )}
       </View>
     );
 
@@ -106,20 +93,53 @@ export default function EventScreen({ navigation }) {
     setShowTheRoad(false);
   };
 
-  // bouton partager
-  const handleClickShare = () => {
-    console.log("Share");
+  // bouton ouverture modal invitation
+  const handleClickOpenInvite = () => {
+    setInviteModal(true);
+    setCollapsed(true);
+  };
+
+  // bouton pour fermer le modal invitation
+  const handleClickCloseInvite = () => {
+    setInviteModal(false);
+    setCollapsed(false);
+    setSelectedFriends([]);
+  };
+
+  // envoyer invitation aux amis selectionnés
+  const handleClickInvite = () => {
+    setSelectedFriends([]);
+    setInviteModal(false);
+    setInviteMessModal(true);
+    setTimeout(() => {
+      setInviteMessModal(false);
+      setInviteMessModal(false);
+      setCollapsed(false);
+      handleClickCloseInvite(); // ferme aussi la modal
+    }, 2000);
   };
 
   // bouton itinéraire
   const handleClickGo = () => {
     setShowTheRoad(true);
+    setCollapsed(true);
   };
 
   // bouton appeler
   const handleClickCall = async () => {
     const cleaned = ficheDetail?.phone?.replace(/[\s\-().]/g, "");
     if (cleaned) await Linking.openURL(`tel:${cleaned}`);
+  };
+
+  // ajout et suppression des amis à inviter
+  const handleClickSelectFriend = (utilisateurId) => {
+    if (selectedFriends.includes(utilisateurId)) {
+      // Déjà sélectionné → on le retire
+      setSelectedFriends(selectedFriends.filter((id) => id !== utilisateurId));
+    } else {
+      // Pas encore sélectionné → on l'ajoute
+      setSelectedFriends([...selectedFriends, utilisateurId]);
+    }
   };
 
   //style minimaliste de la carte
@@ -133,21 +153,6 @@ export default function EventScreen({ navigation }) {
       stylers: [{ visibility: "on" }],
     },
   ];
-
-  // formatage de la distance de l'adresse selectionnée
-  const formatDistance = () => {
-    if (!distance) return "";
-    if (distance < 1) {
-      return `${parseFloat((distance * 1000).toFixed(1))} m`;
-    }
-    return `${parseFloat(distance.toFixed(1))} km`;
-  };
-
-  // formatage de la durée à l'adresse sélectionnée
-  const formatDuration = () => {
-    if (!duration) return "";
-    return Math.ceil(duration);
-  };
 
   //markers des places selon filtre
   const markers = places?.map((data, i) => (
@@ -186,77 +191,17 @@ export default function EventScreen({ navigation }) {
     </TouchableOpacity>
   ));
 
-  // horaires de l'adresse choisie
-  const horaires = ficheDetail?.hours?.map((data, i) => (
-    <Text key={i} style={styles.ficheHoraire}>
-      {data}
-    </Text>
-  ));
-
-  const ActionButton = ({ icon, onPress, label }) => (
-    <TouchableOpacity
-      style={styles.actionBtn}
-      onPress={onPress}
-      activeOpacity={0.8}
-    >
-      <FontAwesome6 name={icon} size={16} color="#FFA85C" />
-      {label && <Text style={styles.actionBtnLabel}>{label}</Text>}
-    </TouchableOpacity>
-  );
-
   // fiche détaillée de l'adresse selectionnée
   const fiche = (
-    <View style={styles.ficheContainer}>
-      <View style={styles.ficheHeader}>
-        <View style={styles.ficheTitleBlock}>
-          <Text style={styles.ficheName}>{ficheDetail?.name}</Text>
-          {ficheDetail?.rating && (
-            <View style={styles.ratingBadge}>
-              <Text style={styles.ratingText}>{ficheDetail?.rating}</Text>
-              <Text style={styles.ratingMax}>/5</Text>
-            </View>
-          )}
-        </View>
-        <TouchableOpacity
-          onPress={handleClickCloseFiche}
-          style={styles.closeBtn}
-        >
-          <FontAwesome6 name="xmark" size={18} color="#999" />
-        </TouchableOpacity>
-      </View>
-      {(distance || duration) && (
-        <View style={styles.ficheMetrics}>
-          {distance && (
-            <View style={styles.metricItem}>
-              <FontAwesome6 name="location-dot" size={12} color="#FFA85C" />
-              <Text style={styles.metricText}>{formatDistance()}</Text>
-            </View>
-          )}
-          {duration && (
-            <View style={styles.metricItem}>
-              <FontAwesome6 name="clock" size={12} color="#FFA85C" />
-              <Text style={styles.metricText}>{formatDuration()} min</Text>
-            </View>
-          )}
-        </View>
-      )}
-      {ficheDetail?.hours?.length > 0 && (
-        <View style={styles.ficheHoraires}>{horaires}</View>
-      )}
-      <View style={styles.ficheActions}>
-        <ActionButton
-          icon="user-group"
-          onPress={handleClickShare}
-          label="Partager"
-        />
-        <ActionButton
-          icon="diamond-turn-right"
-          onPress={handleClickGo}
-          label="Y aller"
-        />
-        <ActionButton icon="phone" onPress={handleClickCall} label="Appeler" />
-      </View>
-    </View>
+    <FicheDetail
+      ficheDetail={ficheDetail}
+      distance={distance}
+      duration={duration}
+      onClose={handleClickCloseFiche}
+      onInvite={handleClickOpenInvite}
+      onGo={handleClickGo}
+      onCall={handleClickCall}
+    />
   );
 
   return (
@@ -296,6 +241,27 @@ export default function EventScreen({ navigation }) {
           />
         )}
       </MapView>
+      {inviteMess && (
+        <View style={styles.inviteMess}>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text style={{ fontSize: 30 }}>🎉</Text>
+            <Text style={{ color: "#fff", fontSize: 30 }}>
+              Invitation envoyée!
+            </Text>
+          </View>
+        </View>
+      )}
+      {inviteModal && (
+        <InviteModal
+          utilisateurs={utilisateurs}
+          selectedFriends={selectedFriends}
+          onSelectFriend={handleClickSelectFriend}
+          onInvite={handleClickInvite}
+          onClose={handleClickCloseInvite}
+        />
+      )}
       <View style={styles.panel}>
         {/* Bouton réduire/agrandir */}
         <TouchableOpacity
@@ -480,93 +446,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     textTransform: "uppercase",
   },
-
-  ficheContainer: {
-    gap: 10,
-  },
-  ficheHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  ficheTitleBlock: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    flex: 1,
-  },
-  ficheName: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#1A1A1A",
-    letterSpacing: -0.3,
-    flex: 1,
-  },
-  ratingBadge: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    backgroundColor: "#FFF4EA",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  ratingText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFA85C",
-  },
-  ratingMax: {
-    fontSize: 11,
-    color: "#FFA85C",
-    marginLeft: 1,
-  },
   closeBtn: {
     padding: 4,
   },
-  ficheMetrics: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  metricItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  metricText: {
-    fontSize: 13,
-    color: "#666",
-    fontWeight: "500",
-  },
-  ficheHoraires: {
-    gap: 2,
-  },
-  ficheHoraire: {
-    fontSize: 12,
-    color: "#AAAAAA",
-  },
-  ficheActions: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 2,
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 10,
-    borderWidth: 1.5,
-    borderColor: "#FFA85C",
-    borderRadius: 12,
-  },
-  actionBtnLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#FFA85C",
-    letterSpacing: 0.2,
-  },
-
   pickerWrapper: {
     gap: 4,
   },
@@ -584,13 +466,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  picker: {
-    height: 45,
-  },
   pickerItem: {
     fontSize: 13,
   },
-
   panelFooter: {
     flexDirection: "row",
     alignItems: "center",
@@ -623,5 +501,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 6,
+  },
+  boutonsBasRow: {
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+    alignItems: "center",
+  },
+  inviteMess: {
+    position: "absolute",
+    left: 40,
+    right: 40,
+    bottom: 350,
+    backgroundColor: "#1B4965",
+    borderRadius: 20,
+    padding: 15,
+    gap: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 20,
+    elevation: 8,
   },
 });
