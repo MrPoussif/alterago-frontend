@@ -28,16 +28,16 @@ export default function PwdInput(props) {
 
 const styles = StyleSheet.create({
   inputRow: {
-    width: "80%",
+    width: "90%",
     flexDirection: "row",
     alignItems: "center",
+    borderBottomColor: "#07905C",
+    borderBottomWidth: 1,
   },
   input: {
     width: "70%",
     paddingBottom: 5,
-    borderBottomColor: "#07905C",
-    borderBottomWidth: 1,
-    fontSize: 15,
+    fontSize: 18,
     marginRight: 30,
   },
 });

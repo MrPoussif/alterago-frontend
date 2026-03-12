@@ -108,7 +108,7 @@ export default function CreationScreen({ navigation }) {
         //Récupère le token Clerk lié au user
         const token = await getToken();
         const signatureRes = await fetch(
-          "http://192.168.100.117:3000/users/signature",
+          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/signature`,
           {
             method: "GET",
             headers: {
@@ -150,7 +150,7 @@ export default function CreationScreen({ navigation }) {
             setImage(cloudData.url);
             // Appel route enregistrement de user sur mongoDB
             const signupRes = await fetch(
-              "http://192.168.100.117:3000/users/signup",
+              `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/signup`,
               {
                 method: "POST",
                 headers: {
@@ -170,10 +170,12 @@ export default function CreationScreen({ navigation }) {
               },
             );
             const signupData = await signupRes.json();
-            // console.log("data", signupData);
-            signupData && alert(signupData.error);
-            // redirige vers le dashboard
-            navigation.navigate("TabNavigator");
+            console.log("data", signupData);
+            if (signupData.result) {
+              navigation.navigate("TabNavigator");
+            } else {
+              alert(signupData.error);
+            }
           }
         }
       } catch (error) {

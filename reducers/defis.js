@@ -39,6 +39,8 @@ const iconesMap = {
   Écriture: "✍️",
   Lecture: "📚",
   Musique: "🎶",
+  Vélo: "🚲",
+  Natation: "🏊",
 };
 
 /* ---------------- Slice Redux ---------------- */
@@ -75,8 +77,13 @@ const defisSlice = createSlice({
         id: Date.now().toString(),
         nom: nom,
         valeur: 0,
-        max: nom !== "Musique" ? 5 : 30,
-        unite: nom !== "Musique" ? "pages" : "min",
+        max:
+          nom === "Musique"
+            ? 30
+            : nom === "Écriture" || nom === "Lecture"
+              ? 5
+              : 60,
+        unite: nom === "Écriture" || nom === "Lecture" ? "pages" : "min",
         min: 0,
         pas: 1,
         icone: iconesMap[nom],

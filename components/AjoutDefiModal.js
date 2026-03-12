@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const defisArray = ["Écriture", "Lecture", "Musique"];
+const defisArray = ["Écriture", "Lecture", "Musique", "Vélo", "Natation"];
 
 export default function AjoutDefiModal({
   visible,
@@ -84,13 +84,6 @@ export default function AjoutDefiModal({
               })}
             </Picker>
           </View>
-          {/* <TextInput
-            placeholder="Nom du nouveau défi"
-            value={defi}
-            onChangeText={setNom}
-            style={styles.input}
-          /> */}
-
           {/* Bouton valider */}
           <TouchableOpacity style={styles.bouton} onPress={onAjouter}>
             <Text style={styles.boutonTexte}>Ajouter</Text>
