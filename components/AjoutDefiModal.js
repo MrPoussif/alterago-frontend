@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const defisArray = ["Écriture", "Lecture", "Musique"];
+const defisArray = ["Écriture", "Lecture", "Musique", "Vélo", "Natation"];
 
 export default function AjoutDefiModal({
   visible,

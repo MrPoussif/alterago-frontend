@@ -23,26 +23,18 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import user from "./reducers/user";
 import defis from "./reducers/defis";
-import { combineReducers } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from "redux-persist";
-import { PersistGate } from "redux-persist/integration/react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Clerk
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 
 // Création du store Redux
-const reducers = combineReducers({ user, defis });
-const persistConfig = { key: "alterago", storage: AsyncStorage };
-
 const store = configureStore({
-  reducer: persistReducer(persistConfig, reducers),
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }),
+  reducer: {
+    user,
+    defis,
+  },
 });
-
-const persistor = persistStore(store);
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,23 +95,21 @@ export default function App() {
       tokenCache={tokenCache}
     >
       <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <SafeAreaView style={styles.container}>
-            <NavigationContainer>
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="Connexion" component={ConnexionScreen} />
-                <Stack.Screen name="Creation" component={CreationScreen} />
-                <Stack.Screen name="TabNavigator" component={TabNavigator} />
-                <Stack.Screen name="Game" component={GameScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-                <Stack.Screen
-                  name="FavoriteDetail"
-                  component={FavoriteDetailScreen}
-                />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </SafeAreaView>
-        </PersistGate>
+        <SafeAreaView style={styles.container}>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Connexion" component={ConnexionScreen} />
+              <Stack.Screen name="Creation" component={CreationScreen} />
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen name="Game" component={GameScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
+              <Stack.Screen
+                name="FavoriteDetail"
+                component={FavoriteDetailScreen}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
       </Provider>
     </ClerkProvider>
   );
