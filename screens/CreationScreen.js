@@ -170,10 +170,12 @@ export default function CreationScreen({ navigation }) {
               },
             );
             const signupData = await signupRes.json();
-            // console.log("data", signupData);
-            signupData && alert(signupData.error);
-            // redirige vers le dashboard
-            signupData.result && navigation.navigate("TabNavigator");
+            console.log("data", signupData);
+            if (signupData.result) {
+              navigation.navigate("TabNavigator");
+            } else {
+              alert(signupData.error);
+            }
           }
         }
       } catch (error) {
