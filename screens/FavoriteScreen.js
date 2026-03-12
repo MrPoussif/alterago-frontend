@@ -11,30 +11,26 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 export default function FavoriteScreen({ navigation }) {
   // La liste des recettes en favoris
   const [listeFavoris, setListeFavoris] = useState([]);
 
   // useFocusEffect se relance chaque fois qu'on revient sur cet écran
-  // c'est mieux que useEffect ici — si on vient d'ajouter un favori et qu'on revient, la liste est à jour
   useFocusEffect(
     useCallback(() => {
       const chargerFavoris = async () => {
         try {
           const favorisSauvegardes = await AsyncStorage.getItem("favoris");
-
-          // Si y'a des favoris sauvegardés on les parse, sinon on met un tableau vide
           const liste = favorisSauvegardes
             ? JSON.parse(favorisSauvegardes)
             : [];
-
           setListeFavoris(liste);
         } catch (err) {
           console.log("Erreur chargement favoris :", err);
         }
       };
-
       chargerFavoris();
     }, []),
   );
@@ -42,10 +38,7 @@ export default function FavoriteScreen({ navigation }) {
   // Demande confirmation puis supprime un favori par son titre
   const supprimerFavori = (titre) => {
     Alert.alert("Supprimer", "Retirer cette recette des favoris ?", [
-      // Bouton annuler — ne fait rien
       { text: "Annuler", style: "cancel" },
-
-      // Bouton supprimer — retire de la liste et met à jour AsyncStorage
       {
         text: "Supprimer",
         style: "destructive",
@@ -70,8 +63,11 @@ export default function FavoriteScreen({ navigation }) {
       <View style={styles.conteneur}>
         {/* Header : flèche retour + titre */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate("Recipe")}>
-            <Text style={styles.retour}>← Retour</Text>
+          <TouchableOpacity
+            style={{ zIndex: 1 }}
+            onPress={() => navigation.navigate("Recipe")}
+          >
+            <FontAwesome6 name="circle-arrow-left" size={28} color="#FFA85C" />
           </TouchableOpacity>
           <Text style={styles.titre}>Mes favoris ❤️</Text>
         </View>
@@ -87,10 +83,11 @@ export default function FavoriteScreen({ navigation }) {
           </View>
         ) : (
           // Sinon on affiche toutes les recettes sauvegardées
-          <ScrollView style={{ width: "100%" }}>
+          <ScrollView
+            style={{ width: "100%" }}
+            showsVerticalScrollIndicator={false}
+          >
             {listeFavoris.map((recette, index) => (
-              // TouchableOpacity rend la carte cliquable
-              // On envoie la recette complète à l'écran de détail via route.params
               <TouchableOpacity
                 key={index}
                 style={styles.carte}
@@ -100,18 +97,35 @@ export default function FavoriteScreen({ navigation }) {
               >
                 {/* Image de la recette */}
                 {recette.image && (
-                  <Image source={{ uri: recette.image }} style={styles.image} />
+                  <View style={styles.imageWrapper}>
+                    <Image
+                      source={{ uri: recette.image }}
+                      style={styles.image}
+                    />
+                    {/* Bouton poubelle flottant sur l'image */}
+                    <TouchableOpacity
+                      style={styles.boutonSupprimer}
+                      onPress={() => supprimerFavori(recette.title)}
+                    >
+                      <FontAwesome6 name="xmark" size={14} color="#888" />
+                    </TouchableOpacity>
+                  </View>
                 )}
 
-                {/* Titre + bouton poubelle */}
+                {/* Titre + bouton poubelle si pas d'image */}
                 <View style={styles.carteHeader}>
                   <Text style={styles.carteTitre}>{recette.title}</Text>
-                  <TouchableOpacity
-                    onPress={() => supprimerFavori(recette.title)}
-                  >
-                    <Text style={styles.poubelle}>🗑️</Text>
-                  </TouchableOpacity>
+                  {!recette.image && (
+                    <TouchableOpacity
+                      onPress={() => supprimerFavori(recette.title)}
+                    >
+                      <FontAwesome6 name="xmark" size={16} color="#aaa" />
+                    </TouchableOpacity>
+                  )}
                 </View>
+
+                {/* Petite ligne orange décorative */}
+                <View style={styles.separateur} />
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -124,12 +138,12 @@ export default function FavoriteScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FAFAF8",
   },
   conteneur: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 16,
     alignItems: "center",
   },
 
@@ -138,8 +152,8 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
     marginBottom: 20,
+    position: "relative",
   },
   retour: {
     fontSize: 16,
@@ -147,8 +161,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   titre: {
+    position: "absolute",
+    left: 0,
+    right: 0,
     fontSize: 22,
     fontWeight: "bold",
+    textAlign: "center",
   },
 
   // Quand y'a pas encore de favoris
@@ -175,28 +193,74 @@ const styles = StyleSheet.create({
 
   // Chaque carte de recette favori
   carte: {
-    backgroundColor: "#f8f8f8",
-    borderRadius: 12,
+    backgroundColor: "#fff",
+    borderRadius: 16,
     marginBottom: 16,
     overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  // Image avec bouton ✕ flottant
+  imageWrapper: {
+    position: "relative",
   },
   image: {
     width: "100%",
-    height: 150,
+    height: 160,
   },
+  boutonSupprimer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  boutonSupprimerTexte: {
+    fontSize: 14,
+    color: "#888",
+    fontWeight: "600",
+  },
+
   carteHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
   },
   carteTitre: {
     fontSize: 16,
     fontWeight: "600",
+    color: "#1A1A1A",
     flex: 1,
     marginRight: 8,
   },
   poubelle: {
-    fontSize: 20,
+    fontSize: 16,
+    color: "#aaa",
+  },
+
+  // Ligne orange décorative en bas de chaque carte
+  separateur: {
+    marginHorizontal: 16,
+    marginBottom: 14,
+    height: 2,
+    width: 32,
+    backgroundColor: "#FFA85C",
+    borderRadius: 2,
   },
 });

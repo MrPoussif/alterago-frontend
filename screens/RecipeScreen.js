@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@clerk/clerk-expo";
 import Header from "../components/common/Header";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 export default function RecipeScreen({ navigation }) {
   const { isSignedIn, getToken } = useAuth();
@@ -38,7 +39,6 @@ export default function RecipeScreen({ navigation }) {
       const listeFavoris = favorisSauvegardes
         ? JSON.parse(favorisSauvegardes)
         : [];
-
       const dejaPresente = listeFavoris.some(
         (f) => f.title === recetteAVerifier.title,
       );
@@ -51,13 +51,11 @@ export default function RecipeScreen({ navigation }) {
   // Ajoute ou retire la recette des favoris
   const toggleFavori = async () => {
     if (!recette) return;
-
     try {
       const favorisSauvegardes = await AsyncStorage.getItem("favoris");
       const listeFavoris = favorisSauvegardes
         ? JSON.parse(favorisSauvegardes)
         : [];
-
       if (enFavori) {
         // Elle est déjà en favori → on la retire
         const listeMisAJour = listeFavoris.filter(
@@ -84,11 +82,9 @@ export default function RecipeScreen({ navigation }) {
       Alert.alert("Non connecté", "Connecte-toi pour voir les recettes.");
       return;
     }
-
     try {
       setLoading(true);
       const token = await getToken();
-
       const reponse = await fetch(
         "http://192.168.100.64:3000/recettes/random",
         {
@@ -98,17 +94,14 @@ export default function RecipeScreen({ navigation }) {
           },
         },
       );
-
       const data = await reponse.json();
       const nouvelleRecette = data.recette;
-
       // On sauvegarde la recette + la date du jour
       await AsyncStorage.setItem(
         "recette_data",
         JSON.stringify(nouvelleRecette),
       );
       await AsyncStorage.setItem("recette_date", getDateDuJour());
-
       setRecette(nouvelleRecette);
       verifierSiEnFavori(nouvelleRecette);
     } catch (err) {
@@ -125,7 +118,6 @@ export default function RecipeScreen({ navigation }) {
       try {
         const dateSauvegardee = await AsyncStorage.getItem("recette_date");
         const recetteSauvegardee = await AsyncStorage.getItem("recette_data");
-
         if (dateSauvegardee === getDateDuJour() && recetteSauvegardee) {
           const recetteParsee = JSON.parse(recetteSauvegardee);
           setRecette(recetteParsee);
@@ -138,7 +130,6 @@ export default function RecipeScreen({ navigation }) {
         fetchRecette();
       }
     };
-
     if (isSignedIn) {
       chargerRecetteDuJour();
     }
@@ -167,52 +158,97 @@ export default function RecipeScreen({ navigation }) {
   return (
     <View style={styles.safeArea}>
       <Header title="RECETTE" navigation={navigation} />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         {recette ? (
           <>
-            {/* Titre + bouton cœur */}
-            <View style={styles.headerRecette}>
-              <Text style={styles.titre}>{recette.title}</Text>
-              <TouchableOpacity onPress={toggleFavori}>
-                <Text style={styles.coeur}>{enFavori ? "❤️" : "🤍"}</Text>
+            {/* Image hero pleine largeur */}
+            <View style={styles.heroWrapper}>
+              {recette.image ? (
+                <Image
+                  source={{ uri: recette.image }}
+                  style={styles.heroImage}
+                />
+              ) : (
+                <View style={styles.heroPlaceholder} />
+              )}
+
+              {/* Overlay sombre en bas de l'image */}
+              <View style={styles.heroOverlay} />
+
+              {/* Titre flottant sur l'image */}
+              <View style={styles.heroContenu}>
+                <Text style={styles.heroTitre}>{recette.title}</Text>
+              </View>
+
+              {/* Bouton favori en haut à droite */}
+              <TouchableOpacity
+                style={styles.boutonFavori}
+                onPress={toggleFavori}
+              >
+                <FontAwesome6
+                  name="heart"
+                  size={32}
+                  color={enFavori ? "#ec6e5b" : "#fff"}
+                  solid={enFavori}
+                />
               </TouchableOpacity>
             </View>
 
-            {/* Image de la recette */}
-            {recette.image && (
-              <Image source={{ uri: recette.image }} style={styles.image} />
-            )}
+            {/* Carte blanche arrondie qui remonte sur l'image */}
+            <View style={styles.carte}>
+              {/* Section instructions */}
+              <Text style={styles.labelSection}>INSTRUCTIONS</Text>
 
-            {/* Instructions */}
-            {recette.instructions && recette.instructions.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.titreSection}>Instructions :</Text>
-                {recette.instructions[0].steps?.map((etape, i) => (
-                  <Text key={i} style={styles.etape}>
-                    {i + 1}. {etape.step}
+              {recette.instructions && recette.instructions.length > 0 ? (
+                recette.instructions[0].steps?.map((etape, i) => (
+                  <View key={i} style={styles.etapeWrapper}>
+                    {/* Ligne verticale + cercle numéro */}
+                    <View style={styles.etapeGauche}>
+                      <View style={styles.etapeNumero}>
+                        <Text style={styles.etapeNumeroTexte}>{i + 1}</Text>
+                      </View>
+                      {/* Ligne verticale sous le numéro sauf dernier */}
+                      {i < (recette.instructions[0].steps?.length ?? 0) - 1 && (
+                        <View style={styles.etapeLigne} />
+                      )}
+                    </View>
+                    <Text style={styles.etapeTexte}>{etape.step}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.vide}>Instructions non disponibles</Text>
+              )}
+
+              {/* Boutons du bas */}
+              <View style={styles.boutonsWrapper}>
+                <TouchableOpacity
+                  style={styles.boutonPrimaire}
+                  onPress={fetchRecette}
+                >
+                  <View style={styles.boutonContenu}>
+                    <FontAwesome6 name="rotate" size={14} color="#fff" />
+                    <Text style={styles.boutonPrimaireTexte}>
+                      Nouvelle recette
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.boutonSecondaire}
+                  onPress={() => navigation.navigate("Favorite")}
+                >
+                  <Text style={styles.boutonSecondaireTexte}>
+                    ❤️ Mes favoris
                   </Text>
-                ))}
+                </TouchableOpacity>
               </View>
-            )}
-
-            {/* Boutons du bas */}
-            <View style={styles.boutonsWrapper}>
-              {/* Bouton nouvelle recette aléatoire */}
-              <TouchableOpacity style={styles.bouton} onPress={fetchRecette}>
-                <Text style={styles.boutonTexte}>🔀 Nouvelle recette</Text>
-              </TouchableOpacity>
-
-              {/* Bouton voir les favoris */}
-              <TouchableOpacity
-                style={[styles.bouton, styles.boutonFavoris]}
-                onPress={() => navigation.navigate("Favorite")}
-              >
-                <Text style={styles.boutonTexte}>❤️ Mes favoris</Text>
-              </TouchableOpacity>
             </View>
           </>
         ) : (
-          <Text>Aucune recette disponible</Text>
+          <Text style={styles.vide}>Aucune recette disponible</Text>
         )}
       </ScrollView>
     </View>
@@ -222,73 +258,211 @@ export default function RecipeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F7F4F0",
   },
   conteneur: {
     flexGrow: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
-    padding: 20,
+    justifyContent: "center",
+  },
+  container: {
+    paddingBottom: 48,
   },
 
-  // Titre + cœur côte à côte
-  headerRecette: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  // ── Hero image ─────────────────────────────────────
+  heroWrapper: {
     width: "100%",
-    marginBottom: 15,
+    height: 340,
+    position: "relative",
   },
-  titre: {
+  heroImage: {
+    width: "100%",
+    height: 340,
+  },
+  heroPlaceholder: {
+    width: "100%",
+    height: 340,
+    backgroundColor: "#E8E0D5",
+  },
+
+  // Dégradé sombre en bas de l'image pour le titre
+  heroOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 125,
+    backgroundColor: "transparent",
+    // Simulé avec une opacité progressive
+    background: "linear-gradient(transparent, rgba(0,0,0,0.6))",
+    // Pour React Native on utilise un fond semi-transparent
+    backgroundColor: "rgba(0,0,0,0.28)",
+    // Masque seulement le bas
+    top: "auto",
+  },
+
+  // Titre blanc en bas de l'image
+  heroContenu: {
+    position: "absolute",
+    bottom: 32,
+    left: 24,
+    right: 70,
+  },
+  heroTitre: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#fff",
+    letterSpacing: -0.5,
+    lineHeight: 32,
+    textShadowColor: "rgba(0,0,0,0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+
+  // Bouton favori flottant en haut à droite
+  boutonFavori: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  boutonFavoriTexte: {
+    fontSize: 20,
+  },
+
+  // ── Carte blanche qui remonte sur l'image ──────────
+  carte: {
+    backgroundColor: "#F7F4F0",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    marginTop: -28,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 8,
+    minHeight: 400,
+  },
+
+  // Petit trait de "poignée" en haut de la carte
+  poignee: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#DDD",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 28,
+  },
+
+  titreCarte: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+    lineHeight: 28,
+    marginBottom: 20,
+  },
+
+  labelSection: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#C4BAB0",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 20,
+  },
+
+  // ── Étapes avec ligne verticale ────────────────────
+  etapeWrapper: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 4,
+    gap: 16,
+  },
+  etapeGauche: {
+    alignItems: "center",
+    width: 28,
+  },
+  etapeNumero: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#FFA85C",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  etapeNumeroTexte: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#fff",
+  },
+  // Ligne verticale qui relie les étapes entre elles
+  etapeLigne: {
+    width: 2,
     flex: 1,
-    marginRight: 10,
+    minHeight: 24,
+    backgroundColor: "#F0EAE0",
+    marginVertical: 4,
   },
-  coeur: {
-    fontSize: 28,
-  },
-
-  image: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  section: {
-    width: "100%",
-    marginTop: 10,
-  },
-  titreSection: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#FFA85C",
-    marginBottom: 5,
-  },
-  etape: {
-    fontSize: 14,
-    marginBottom: 8,
-    lineHeight: 20,
+  etapeTexte: {
+    flex: 1,
+    fontSize: 15,
+    color: "#555",
+    lineHeight: 23,
+    paddingBottom: 24,
+    paddingTop: 3,
   },
 
-  // Les boutons en bas
+  // ── Boutons ────────────────────────────────────────
   boutonsWrapper: {
-    width: "100%",
-    marginTop: 20,
+    marginTop: 16,
     gap: 12,
   },
-  bouton: {
+  boutonPrimaire: {
     backgroundColor: "#FFA85C",
-    borderRadius: 20,
-    paddingVertical: 14,
+    borderRadius: 16,
+    paddingVertical: 17,
     alignItems: "center",
+    shadowColor: "#FFA85C",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  boutonFavoris: {
-    backgroundColor: "#ec6e5b",
+  boutonContenu: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
-  boutonTexte: {
+  boutonPrimaireTexte: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "800",
     fontSize: 15,
+    letterSpacing: 0.3,
+  },
+  boutonSecondaire: {
+    backgroundColor: "#ec6e5b",
+    borderRadius: 16,
+    paddingVertical: 17,
+    alignItems: "center",
+    shadowColor: "#ec6e5b",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  boutonSecondaireTexte: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 15,
+    letterSpacing: 0.3,
+  },
+
+  vide: {
+    color: "#bbb",
+    fontSize: 15,
+    marginTop: 40,
+    textAlign: "center",
   },
 });
