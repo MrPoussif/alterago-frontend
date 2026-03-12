@@ -19,7 +19,7 @@ import FicheDetail from "../components/eventFicheDetaillee";
 import InviteModal from "../components/eventInviteModal";
 import useLocation from "../hooks/useLocation";
 import useCategories from "../hooks/useCategories";
-import { UTILISATEURS_FICTIFS } from "../constants/utilisateursfictifs";
+import { UTILISATEURS_FICTIFS } from "../constants/utilisateursFictifs";
 
 export default function EventScreen({ navigation }) {
   const [fichesListVisible, setFichesListVisible] = useState(false); //état visibilité de la liste des adresses

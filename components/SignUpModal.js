@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useSignUp } from "@clerk/clerk-expo";
+import PwdInput from "../components/PwdInput";
 
 export default function SignUpModal({ visible, onClose, onSuccess }) {
   const {
@@ -62,14 +63,20 @@ export default function SignUpModal({ visible, onClose, onSuccess }) {
                 autoComplete="email"
                 inputMode="email"
               />
-              <TextInput
+              {/* <TextInput
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
                 style={styles.input}
                 autoComplete="new-password"
                 secureTextEntry
-              />
+              /> */}
+              <PwdInput
+                placeholder={"Mot de passe"}
+                autoComplete={"new-password"}
+                setPwd={setPassword}
+                value={password}
+              ></PwdInput>
               <TouchableOpacity onPress={onSignUpPress} style={styles.button}>
                 {loading ? (
                   <ActivityIndicator color="#fff" />
@@ -105,8 +112,8 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 22, fontWeight: "600", marginBottom: 15 },
   input: {
-    width: "100%",
-    borderBottomColor: "#FFA85C",
+    width: "90%",
+    borderBottomColor: "#07905C",
     borderBottomWidth: 1,
     fontSize: 18,
     marginTop: 15,

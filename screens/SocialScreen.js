@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-import { UTILISATEURS_FICTIFS } from "../constants/utilisateursfictifs";
+import { UTILISATEURS_FICTIFS } from "../constants/utilisateursFictifs.js";
 
 export default function SocialScreen() {
   // On garde en mémoire quels utilisateurs ont été ajoutés

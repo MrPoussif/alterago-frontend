@@ -17,12 +17,12 @@ export default function ConnexionScreen({ navigation }) {
   const [signUpVisible, setSignUpVisible] = useState(false);
 
   // *** Check if user is already SignedIn
-  const { isSignedIn } = useUser();
-  useEffect(() => {
-    if (isSignedIn) {
-      navigation.replace("TabNavigator");
-    }
-  }, [isSignedIn]);
+  // const { isSignedIn } = useUser();
+  // useEffect(() => {
+  //   if (isSignedIn) {
+  //     navigation.replace("TabNavigator");
+  //   }
+  // }, [isSignedIn]);
 
   return (
     <>
