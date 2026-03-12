@@ -59,12 +59,13 @@ const TabNavigator = () => {
           if (route.name === "Home") iconName = "home";
           else if (route.name === "Event") iconName = "map";
           else if (route.name === "Social") iconName = "users";
-
+          if (route.name === "Home") size = 35;
           return <FontAwesome name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#ec6e5b",
-        tabBarInactiveTintColor: "#335561",
+        tabBarActiveTintColor: "#FFA85C",
+        tabBarInactiveTintColor: "#1B4965",
         headerShown: false,
+        tabBarShowLabel: false,
       })}
     >
       <Tab.Screen name="Event" component={EventScreen} />
