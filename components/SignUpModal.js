@@ -32,7 +32,8 @@ export default function SignUpModal({ visible, onClose, onSuccess }) {
       onSuccess();
       onClose();
     } catch (err) {
-      Alert.alert("Sign Up Error", err.errors?.[0]?.message || "Try again");
+      Alert.alert("Sign Up Error", err.errors?.[0]?.longMessage || "Try again");
+      // console.log("error :", err.errors);
     } finally {
       setLoading(false);
     }
