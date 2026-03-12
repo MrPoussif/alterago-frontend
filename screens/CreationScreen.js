@@ -173,7 +173,7 @@ export default function CreationScreen({ navigation }) {
             // console.log("data", signupData);
             signupData && alert(signupData.error);
             // redirige vers le dashboard
-            navigation.navigate("TabNavigator");
+            signupData.result && navigation.navigate("TabNavigator");
           }
         }
       } catch (error) {
