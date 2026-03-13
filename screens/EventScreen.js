@@ -56,7 +56,7 @@ export default function EventScreen({ navigation }) {
   const handleClickSearch = async () => {
     const token = await getToken();
     const response = await fetch(
-      `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/nearby`,
+      `${process.env.EXPO_PUBLIC_MY_HTTP}/events/nearby`,
       {
         method: "POST",
         headers: {

@@ -108,7 +108,7 @@ export default function CreationScreen({ navigation }) {
         //Récupère le token Clerk lié au user
         const token = await getToken();
         const signatureRes = await fetch(
-          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/signature`,
+          `${process.env.EXPO_PUBLIC_MY_HTTP}/users/signature`,
           {
             method: "GET",
             headers: {
@@ -150,7 +150,7 @@ export default function CreationScreen({ navigation }) {
             setImage(cloudData.url);
             // Appel route enregistrement de user sur mongoDB
             const signupRes = await fetch(
-              `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/signup`,
+              `${process.env.EXPO_PUBLIC_MY_HTTP}/users/signup`,
               {
                 method: "POST",
                 headers: {

@@ -59,8 +59,9 @@ export default function HomeScreen({ navigation }) {
     (async () => {
       try {
         const token = await getToken();
+        console.log("🚀 ~ HomeScreen ~ token:", token);
         const userRes = await fetch(
-          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/users/${user.id}`,
+          `${process.env.EXPO_PUBLIC_MY_HTTP}/users/${user.id}`,
           {
             method: "GET",
             headers: {

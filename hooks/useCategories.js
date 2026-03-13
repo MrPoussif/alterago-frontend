@@ -11,7 +11,7 @@ export default function useCategories() {
       try {
         const token = await getToken();
         const response = await fetch(
-          `http://${process.env.EXPO_PUBLIC_MY_IP}:3000/events/categories`,
+          `${process.env.EXPO_PUBLIC_MY_HTTP}/events/categories`,
           {
             headers: {
               "Content-Type": "application/json",
